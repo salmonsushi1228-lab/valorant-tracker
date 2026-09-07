@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>발로란트 트래커</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C0F;
+    --panel: #14171C;
+    --panel-2: #191D23;
+    --line: #262B32;
+    --red: #FF4655;
+    --teal: #4CE0C3;
+    --amber: #F2B138;
+    --text: #ECE8E1;
+    --muted: #868D96;
+    --cut: 10px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); }
+  body{
+    font-family:'Inter', sans-serif; color: var(--text); padding: 28px 16px 60px; min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(255,70,85,0.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(76,224,195,0.05), transparent 55%),
+      var(--bg);
+  }
+  ::selection{ background:var(--red); color:#100608; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:#0D0F13; }
+  ::-webkit-scrollbar-thumb{ background:#31363E; border-radius:0; }
+  ::-webkit-scrollbar-thumb:hover{ background:#454B54; }
+  .wrap{ max-width: 900px; margin: 0 auto; }
+
+  .brandline{ display:flex; align-items:center; gap:12px; margin-bottom: 4px; }
+  .brandline .bar{ width:5px; height:26px; background:var(--red); box-shadow:0 0 14px rgba(255,70,85,0.75); animation: barpulse 2.2s ease-in-out infinite; }
+  @keyframes barpulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
+  h1{ font-family:'Chakra Petch', sans-serif; font-weight:700; font-size: clamp(24px,5vw,34px); letter-spacing:0.5px; margin:0;
+    background:linear-gradient(90deg, var(--text) 55%, var(--red)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tagline{ color:var(--muted); font-size:13.5px; margin: 6px 0 16px 17px; }
+  .hero{ margin-bottom:22px; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-left:17px; }
+  .chip{
+    font-family:'Chakra Petch',sans-serif; font-size:11.5px; font-weight:600; letter-spacing:0.03em;
+    color:var(--teal); border:1px solid rgba(76,224,195,0.35); background:rgba(76,224,195,0.06);
+    padding:5px 11px; clip-path: polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+  }
+
+  .panel{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2) 140%); border:1px solid var(--line);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    padding: 22px; position:relative; transition: border-color .2s ease, box-shadow .2s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28); border-top:2px solid var(--red);
+  }
+  .panel.accent-teal{ border-top-color:var(--teal); }
+  .panel.accent-amber{ border-top-color:var(--amber); }
+  .panel:hover{ box-shadow: 0 10px 30px rgba(0,0,0,0.36); }
+  .panel + .panel{ margin-top:16px; }
+
+  .search-grid{ display:grid; grid-template-columns: 1fr 110px; gap:10px; }
+  .field-label{ font-size:11.5px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+  input, select, textarea{
+    width:100%; background:#0D0F13; border:1px solid var(--line); color:var(--text);
+    padding:11px 12px; font-family:'Inter',sans-serif; font-size:14.5px; outline:none;
+    clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  select{ cursor:pointer; }
+  textarea{ resize:vertical; min-height:84px; font-family:'Inter',sans-serif; line-height:1.6; }
+  input:focus, select:focus, textarea:focus{ border-color:var(--red); box-shadow:0 0 0 3px rgba(255,70,85,0.12); }
+  input::placeholder, textarea::placeholder{ color:#4B5158; }
+  .row2{ display:flex; gap:10px; margin-top:12px; }
+  .row2 > div{ flex:1; }
+  .apikey-note{ font-size:12px; color:var(--muted); margin-top:10px; line-height:1.6; }
+  .apikey-note a{ color:var(--teal); text-decoration:none; }
+  .apikey-note a:hover{ text-decoration:underline; }
+
+  button.primary{
+    margin-top:14px; width:100%; background:linear-gradient(135deg, var(--red), #C22E3B); color:#100608; border:none;
+    font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; letter-spacing:0.06em; padding:14px; cursor:pointer;
+    text-transform:uppercase;
+    clip-path: polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+    transition: filter .15s ease, transform .1s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(255,70,85,0.22);
+  }
+  button.primary:hover{ filter:brightness(1.08); box-shadow: 0 4px 22px rgba(255,70,85,0.28); }
+  button.primary:active{ transform: scale(0.995); }
+  button.primary:disabled{ background:#3A3E44; color:#7d8288; cursor:not-allowed; box-shadow:none; }
+
+  button.ghost{
+    background:transparent; border:1px solid var(--line); color:var(--text);
+    font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:13px; padding:9px 16px; cursor:pointer;
+    clip-path: polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+    transition: border-color .15s ease, color .15s ease, transform .1s ease;
+  }
+  button.ghost:hover{ border-color:var(--teal); color:var(--teal); }
+  button.ghost:active{ transform: scale(0.98); }
+  button.ghost:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .status{ font-size:13.5px; margin-top:14px; padding-top:2px; }
+  .status.err{ color:var(--red); }
+  .status.info{ color:var(--muted); }
+
+  .section-head{ display:flex; align-items:center; gap:10px; margin: 34px 0 14px 2px; }
+  .section-head .num{
+    font-family:'Chakra Petch',sans-serif; color:var(--red); font-weight:700; font-size:12px;
+    border:1px solid var(--red); padding:3px 7px; letter-spacing:0.03em;
+    clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+  }
+  .section-head h2{ font-family:'Chakra Petch',sans-serif; font-size:17px; font-weight:600; letter-spacing:0.03em; margin:0; }
+  .section-head .line{ flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent); }
+
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  @media (max-width:640px){ .grid2{ grid-template-columns: 1fr; } .search-grid{ grid-template-columns: 1fr; } }
+
+  #results{ animation: fadeUp .35s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+  .profile-top{ display:flex; gap:14px; align-items:center; }
+  .card-art{ width:64px; height:64px; object-fit:cover; border:1px solid var(--line); flex-shrink:0; }
+  .p-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:19px; line-height:1.2; }
+  .p-tag{ color:var(--muted); font-size:14px; }
+  .p-meta{ margin-top:6px; font-size:12.5px; color:var(--muted); }
+  .badge{ display:inline-block; font-size:11px; padding:2px 8px; border:1px solid var(--line); color:var(--teal); margin-top:8px; letter-spacing:0.05em; }
+
+  .rank-tier{ font-family:'Chakra Petch',sans-serif; font-size:20px; font-weight:700; }
+  .rank-rr{ color:var(--muted); font-size:13px; margin-top:2px; }
+  .rr-bar{ height:6px; background:#0D0F13; border:1px solid var(--line); margin-top:10px; overflow:hidden; }
+  .rr-fill{ height:100%; background:linear-gradient(90deg, var(--teal), #7CF3DA); transition: width .5s ease; }
+  .peak-line{ margin-top:12px; font-size:12.5px; color:var(--muted); }
+  .peak-line b{ color:var(--text); font-weight:600; }
+  .delta-pos{ color:var(--teal); } .delta-neg{ color:var(--red); }
+
+  .match-row{
+    display:flex; align-items:center; gap:12px; padding: 12px 14px; border:1px solid var(--line);
+    background:var(--panel-2); margin-bottom:8px; cursor:pointer;
+    transition: border-color .15s ease, transform .12s ease, background .15s ease;
+  }
+  .match-row:hover{ border-color:#3A3F47; background:#1D2129; transform: translateX(2px); }
+  .match-row.win{ border-left:3px solid var(--teal); }
+  .match-row.loss{ border-left:3px solid var(--red); }
+  .match-row.draw{ border-left:3px solid var(--muted); }
+  .m-agent-icon{ width:38px; height:38px; border-radius:50%; background:#0D0F13; border:1px solid var(--line); object-fit:cover; flex-shrink:0; }
+  .m-mid{ flex:1; min-width:0; }
+  .m-map{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:14.5px; }
+  .m-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
+  .m-kda{ font-family:'Chakra Petch',sans-serif; font-size:15px; font-weight:600; text-align:right; white-space:nowrap; }
+  .m-kda .d{ color:var(--muted); font-weight:500; font-size:12.5px; }
+  .m-score{ width:56px; text-align:right; font-size:12.5px; color:var(--muted); flex-shrink:0; }
+  .m-result{ width:44px; text-align:center; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.04em; flex-shrink:0; }
+  .m-result.win{ color:var(--teal); } .m-result.loss{ color:var(--red); } .m-result.draw{ color:var(--muted); }
+
+  .match-detail{
+    display:none; border:1px solid var(--line); border-top:none; background:#0D0F13;
+    margin-top:-8px; margin-bottom:8px; padding:12px 14px; font-size:12.5px; max-height:420px; overflow-y:auto;
+    animation: fadeUp .2s ease;
+  }
+  .kill-line{ display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); color:var(--muted); }
+  .kill-line b{ color:var(--text); font-weight:600; }
+  .kill-line .k-you{ color:var(--teal); }
+  .kill-line .v-you{ color:var(--red); }
+
+  .table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .table th{ text-align:left; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .table td{ padding:9px 10px; border-bottom:1px solid var(--line); }
+  .table tr{ transition: background .12s ease; }
+  .table tbody tr:hover{ background:rgba(255,255,255,0.02); }
+  .table tr:last-child td{ border-bottom:none; }
+  .table td.num{ font-family:'Chakra Petch',sans-serif; font-weight:600; }
+  .wr-good{ color:var(--teal); } .wr-bad{ color:var(--red); }
+
+  .info-box{
+    border:1px solid var(--amber); background: rgba(242,177,56,0.07); padding:14px 16px; font-size:13px; line-height:1.7; color:#E9CE94;
+    clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); margin-bottom:16px;
+  }
+  .info-box b{ color:var(--amber); }
+
+  .bundle-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .bundle-grid{ grid-template-columns:1fr; } }
+  .bundle-card{
+    border:1px solid var(--line); background:var(--panel-2); overflow:hidden;
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .bundle-card:hover{ border-color:#3A3F47; transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
+  .bundle-img-wrap{ position:relative; overflow:hidden; }
+  .bundle-img{ width:100%; height:130px; object-fit:cover; display:block; background:#0D0F13; transition: transform .3s ease; }
+  .bundle-card:hover .bundle-img{ transform: scale(1.05); }
+  .bundle-img-empty{ display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; height:130px; }
+  .bundle-img-wrap::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:44px;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.55)); pointer-events:none;
+  }
+  .bundle-discount-tag{
+    position:absolute; top:8px; right:8px; background:var(--red); color:#100608; font-family:'Chakra Petch',sans-serif;
+    font-weight:700; font-size:10.5px; letter-spacing:0.04em; padding:3px 8px; z-index:1;
+  }
+  .bundle-body{ padding:12px 14px; }
+  .bundle-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; }
+  .bundle-price{ margin-top:6px; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px; }
+  .vp-icon{ font-family:'Chakra Petch',sans-serif; font-size:10px; font-weight:700; color:var(--amber); border:1px solid rgba(242,177,56,0.5); padding:1px 5px; letter-spacing:0.03em; }
+  .bundle-timer{ margin-top:8px; font-family:'Chakra Petch',sans-serif; font-size:13px; color:var(--red); letter-spacing:0.03em; }
+  .bundle-timer.long{ color:var(--muted); }
+
+  .skeleton{ color:var(--muted); font-size:13.5px; padding: 6px 2px; }
+  .skeleton.pulse{ animation: pulse 1.3s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:0.5; } 50%{ opacity:1; } }
+  .empty{ color:var(--muted); font-size:13.5px; padding:10px 2px; }
+  footer{ text-align:center; color:#4B5158; font-size:11.5px; margin-top:40px; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="brandline"><div class="bar"></div><h1>발로란트 트래커</h1></div>
+    <div class="tagline">Riot ID로 전적 · 랭크 · 요원/맵 통계 · 현재 상점 번들을 조회합니다</div>
+    <div class="chip-row">
+      <span class="chip">전적 기록</span>
+      <span class="chip">랭크 추적</span>
+      <span class="chip">요원 · 맵 통계</span>
+      <span class="chip">상점 번들</span>
+    </div>
+  </div>
+
+  <!-- 검색 -->
+  <div class="panel accent-red">
+    <div class="search-grid">
+      <div>
+        <div class="field-label">Riot ID</div>
+        <input id="riotName" placeholder="이름#태그  (예: Henrik3#VALO)">
+      </div>
+      <div>
+        <div class="field-label">지역</div>
+        <select id="region">
+          <option value="kr">한국</option>
+          <option value="ap">아시아</option>
+          <option value="na">북미</option>
+          <option value="eu">유럽</option>
+          <option value="latam">남미</option>
+          <option value="br">브라질</option>
+        </select>
+      </div>
+    </div>
+    <div class="apikey-note">
+      이 트래커는 커뮤니티 API인 <b>HenrikDev API</b>를 사용해요. API 키는 코드 안에 미리 설정되어 있어요.
+    </div>
+    <button class="primary" id="searchBtn">전적 조회</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="results" style="display:none;">
+    <div class="grid2">
+      <div class="panel accent-teal" id="profileCard"></div>
+      <div class="panel accent-amber" id="rankCard"></div>
+    </div>
+
+    <div class="section-head"><span class="num">02</span><h2>전적 기록</h2><div class="line"></div></div>
+    <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px 2px;">경기 행을 클릭하면 라운드별 킬피드를 볼 수 있어요</div>
+    <div class="row2" style="margin-top:0;margin-bottom:14px;align-items:flex-end;">
+      <div style="max-width:220px;">
+        <div class="field-label">모드 필터</div>
+        <select id="modeFilter"><option value="">전체 모드</option></select>
+      </div>
+      <div style="flex:0 0 auto;font-size:12px;color:var(--muted);padding-bottom:11px;" id="matchCountLabel"></div>
+    </div>
+    <div id="matchList"></div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="ghost" id="loadMoreBtn" style="display:none;">더 불러오기</button>
+    </div>
+    <div class="status" id="matchListStatus"></div>
+
+    <div class="section-head"><span class="num">03</span><h2>요원별 통계</h2><div class="line"></div></div>
+    <div class="panel"><div id="agentStats"></div></div>
+
+    <div class="section-head"><span class="num">04</span><h2>맵별 승률</h2><div class="line"></div></div>
+    <div class="panel"><div id="mapStats"></div></div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px;" id="statsFootnote">※ 요원/맵 통계는 현재까지 불러온 전적 기준이에요</div>
+  </div>
+
+  <!-- 계정 비교 -->
+  <div class="section-head"><span class="num">05</span><h2>여러 계정 비교</h2><div class="line"></div></div>
+  <div class="panel accent-teal">
+    <div class="field-label">Riot ID 목록 (한 줄에 하나씩, 최대 4개)</div>
+    <textarea id="compareList" placeholder="Henrik3#VALO&#10;Ryumin#ELI&#10;..."></textarea>
+    <div class="row2">
+      <div>
+        <div class="field-label">지역 (전체 동일 적용)</div>
+        <select id="compareRegion">
+          <option value="kr">한국</option>
+          <option value="ap">아시아</option>
+          <option value="na">북미</option>
+          <option value="eu">유럽</option>
+          <option value="latam">남미</option>
+          <option value="br">브라질</option>
+        </select>
+      </div>
+    </div>
+    <button class="primary" id="compareBtn">계정 비교하기</button>
+    <div class="status" id="compareStatus"></div>
+    <div id="compareResult" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- 상점 -->
+  <div class="section-head"><span class="num">06</span><h2>상점</h2><div class="line"></div></div>
+  <div class="info-box">
+    <b>일일 상점 · 야시장은 계정별 개인 정보라 공개 API로 조회할 수 없어요.</b> 라이엇이 개인 로그인 세션 없이는 누구에게도 상점 데이터를 공개하지 않기 때문이에요. 대신 <b>지금 서버 전체에 떠 있는 번들(모두에게 동일)</b>과 <b>남은 기간</b>은 아래에서 확인할 수 있어요.
+  </div>
+  <div class="panel accent-amber">
+    <button class="ghost" id="storeBtn">현재 번들 불러오기</button>
+    <div class="status" id="storeStatus"></div>
+    <div id="bundleWrap" style="margin-top:14px;"></div>
+  </div>
+
+  <footer>Powered by HenrikDev API &amp; valorant-api.com · Riot Games와 무관한 비공식 커뮤니티 도구입니다</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const HENRIK_API_KEY = 'HDEV-ef65fea9-f78a-4023-b15e-38a6e18e9df1';
+let agentIconMap = null;
+let bundleTimers = [];
+const matchDetailCache = {};
+
+// 전적 기록 상태 (전체 기록 누적 로딩 + 모드 필터)
+let allMatches = [];
+let currentSearch = null; // { region, name, tag, headers, puuid }
+let matchesExhausted = false;
+let matchesLoading = false;
+const MATCH_BATCH_SIZE = 20; // 한 번에 불러올 경기 수 (화면 기준)
+const API_MAX_SIZE = 10; // HenrikDev API가 요청당 허용하는 최대 size
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function fetchJson(url, headers){
+  const res = await fetch(url, { headers: headers || {} });
+  let body = null;
+  try { body = await res.json(); } catch(e) {}
+  if(!res.ok){
+    const msg = body?.errors?.[0]?.message || body?.message || `요청 실패 (HTTP ${res.status})`;
+    throw new Error(msg);
+  }
+  return body;
+}
+
+function setStatus(el, msg, type){
+  el.textContent = msg || '';
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+// ---------------- 공통: 경기 결과 판정 ----------------
+function getMatchResult(m, me){
+  const teams = m.teams || [];
+  const myTeam = teams.find(t => t.team_id === me.team_id) || null;
+  const oppTeam = teams.find(t => t.team_id !== me.team_id) || null;
+  let resultLabel = '-', resultClass = 'draw', scoreText = '', win = null;
+  if(myTeam){
+    if(myTeam.won === true || myTeam.has_won === true) win = true;
+    else if(myTeam.won === false || myTeam.has_won === false) win = false;
+    resultLabel = win === true ? '승리' : (win === false ? '패배' : '-');
+    resultClass = win === true ? 'win' : (win === false ? 'loss' : 'draw');
+    const myRounds = myTeam.rounds_won ?? myTeam.roundsWon;
+    const oppRounds = oppTeam?.rounds_won ?? oppTeam?.roundsWon;
+    if(myRounds != null && oppRounds != null) scoreText = `${myRounds}-${oppRounds}`;
+  }
+  return { win, resultLabel, resultClass, scoreText };
+}
+
+// ---------------- 전적 조회 ----------------
+$('searchBtn').addEventListener('click', runSearch);
+$('riotName').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') runSearch(); });
+
+async function fetchMatchesChunk(region, name, tag, headers, start, size){
+  const r = await fetchJson(`https://api.henrikdev.xyz/valorant/v4/matches/${region}/pc/${encodeURIComponent(name)}/${encodeURIComponent(tag)}?size=${size}&start=${start}`, headers);
+  return r.data || [];
+}
+
+// API는 요청당 최대 10경기까지만 허용해서, 원하는 배치 크기(예: 20개)를
+// 채울 때까지 10개씩 여러 번 나눠서 불러오고 이어붙임
+async function fetchMatchesBatch(region, name, tag, headers, start, batchSize){
+  let collected = [];
+  let offset = start;
+  while(collected.length < batchSize){
+    const size = Math.min(API_MAX_SIZE, batchSize - collected.length);
+    const chunk = await fetchMatchesChunk(region, name, tag, headers, offset, size);
+    collected = collected.concat(chunk);
+    offset += chunk.length;
+    if(chunk.length < size) break; // 더 이상 남은 경기가 없음
+  }
+  return collected;
+}
+
+async function runSearch(){
+  const raw = $('riotName').value.trim();
+  const region = $('region').value;
+  const apiKey = HENRIK_API_KEY;
+  const statusEl = $('status');
+
+  if(!raw.includes('#')){
+    setStatus(statusEl, 'Riot ID를 "이름#태그" 형식으로 입력해주세요 (예: Henrik3#VALO)', 'err');
+    return;
+  }
+  const [name, tag] = raw.split('#').map(s => s.trim());
+  const headers = { 'Authorization': apiKey };
+
+  $('searchBtn').disabled = true;
+  setStatus(statusEl, '조회하는 중...', 'info');
+  $('results').style.display = 'none';
+
+  try{
+    const accountRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v1/account/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, headers);
+    const account = accountRes.data;
+    renderProfile(account, region);
+
+    try{
+      const mmrRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v3/mmr/${region}/pc/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, headers);
+      renderRank(mmrRes.data);
+    }catch(e){
+      $('rankCard').innerHTML = `<div class="field-label">랭크 정보</div><div class="empty">랭크 정보를 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+    }
+
+    allMatches = [];
+    matchesExhausted = false;
+    currentSearch = { region, name, tag, headers, puuid: account.puuid };
+    try{
+      const chunk = await fetchMatchesBatch(region, name, tag, headers, 0, MATCH_BATCH_SIZE);
+      allMatches = chunk;
+      if(chunk.length < MATCH_BATCH_SIZE) matchesExhausted = true;
+      populateModeFilter();
+      await renderMatchList();
+      renderAgentStats(allMatches, account.puuid);
+      renderMapStats(allMatches, account.puuid);
+      updateLoadMoreUI();
+    }catch(e){
+      $('matchList').innerHTML = `<div class="empty">최근 전적을 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+      $('agentStats').innerHTML = `<div class="empty">통계를 계산할 수 없어요.</div>`;
+      $('mapStats').innerHTML = `<div class="empty">통계를 계산할 수 없어요.</div>`;
+      $('loadMoreBtn').style.display = 'none';
+    }
+
+    $('results').style.display = 'block';
+    setStatus(statusEl, '', '');
+  }catch(e){
+    setStatus(statusEl, `조회 실패: ${e.message}`, 'err');
+  }finally{
+    $('searchBtn').disabled = false;
+  }
+}
+
+function renderProfile(account, region){
+  const card = account.card || {};
+  const regionLabel = { kr:'한국', ap:'아시아', na:'북미', eu:'유럽', latam:'남미', br:'브라질' }[region] || region;
+  $('profileCard').innerHTML = `
+    <div class="field-label">계정 정보</div>
+    <div class="profile-top" style="margin-top:10px;">
+      ${card.small ? `<img class="card-art" src="${card.small}" alt="">` : ''}
+      <div>
+        <div class="p-name">${escapeHtml(account.name)} <span class="p-tag">#${escapeHtml(account.tag)}</span></div>
+        <div class="p-meta">계정 레벨 ${escapeHtml(account.account_level)}</div>
+      </div>
+    </div>
+    <span class="badge">${escapeHtml(regionLabel)} 서버</span>
+  `;
+}
+
+function renderRank(data){
+  const cur = data.current || {};
+  const peak = data.peak || {};
+  const rr = cur.rr ?? 0;
+  const change = cur.last_change ?? 0;
+  const changeClass = change > 0 ? 'delta-pos' : (change < 0 ? 'delta-neg' : '');
+  const changeSign = change > 0 ? '+' : '';
+  $('rankCard').innerHTML = `
+    <div class="field-label">현재 랭크</div>
+    <div class="rank-tier" style="margin-top:10px;">${escapeHtml(cur.tier?.name || '언랭크')}</div>
+    <div class="rank-rr">RR ${rr} / 100 &nbsp;·&nbsp; 최근 변동 <span class="${changeClass}">${changeSign}${change}</span></div>
+    <div class="rr-bar"><div class="rr-fill" style="width:${Math.max(0, Math.min(100, rr))}%"></div></div>
+    <div class="peak-line">시즌 피크 <b>${escapeHtml(peak.tier?.name || '-')}</b></div>
+  `;
+}
+
+async function ensureAgentIcons(){
+  if(agentIconMap) return agentIconMap;
+  agentIconMap = {};
+  try{
+    const res = await fetch('https://valorant-api.com/v1/agents?isPlayableCharacter=true');
+    const json = await res.json();
+    (json.data || []).forEach(a => { agentIconMap[a.displayName] = a.displayIcon; });
+  }catch(e){ /* 아이콘 없이도 진행 */ }
+  return agentIconMap;
+}
+
+// ---------------- 모드 필터 + 전체 기록 렌더링 ----------------
+function getModeName(m){
+  return m.metadata?.queue?.name || m.metadata?.mode || '알 수 없는 모드';
+}
+
+function populateModeFilter(){
+  const sel = $('modeFilter');
+  const prev = sel.value;
+  const modes = Array.from(new Set(allMatches.map(getModeName))).sort();
+  sel.innerHTML = `<option value="">전체 모드</option>` + modes.map(mo => `<option value="${escapeHtml(mo)}">${escapeHtml(mo)}</option>`).join('');
+  if(modes.includes(prev)) sel.value = prev;
+}
+
+function getFilteredMatches(){
+  const modeVal = $('modeFilter').value;
+  return modeVal ? allMatches.filter(m => getModeName(m) === modeVal) : allMatches;
+}
+
+async function renderMatchList(){
+  const filtered = getFilteredMatches();
+  await renderMatches(filtered, currentSearch.puuid);
+  const total = allMatches.length;
+  const shown = filtered.length;
+  $('matchCountLabel').textContent = $('modeFilter').value
+    ? `${shown}경기 표시 중 (전체 ${total}경기 불러옴)`
+    : `${total}경기 불러옴`;
+}
+
+function updateLoadMoreUI(){
+  const btn = $('loadMoreBtn');
+  const statusEl = $('matchListStatus');
+  if(matchesExhausted){
+    btn.style.display = allMatches.length ? 'inline-block' : 'none';
+    btn.disabled = true;
+    btn.textContent = '모든 전적을 불러왔어요';
+    setStatus(statusEl, '', '');
+  }else{
+    btn.style.display = 'inline-block';
+    btn.disabled = matchesLoading;
+    btn.textContent = matchesLoading ? '불러오는 중...' : '더 불러오기';
+  }
+}
+
+async function loadMoreMatches(){
+  if(!currentSearch || matchesLoading || matchesExhausted) return;
+  matchesLoading = true;
+  updateLoadMoreUI();
+  try{
+    const { region, name, tag, headers } = currentSearch;
+    const chunk = await fetchMatchesBatch(region, name, tag, headers, allMatches.length, MATCH_BATCH_SIZE);
+    if(chunk.length < MATCH_BATCH_SIZE) matchesExhausted = true;
+    if(chunk.length){
+      allMatches = allMatches.concat(chunk);
+      populateModeFilter();
+      await renderMatchList();
+      renderAgentStats(allMatches, currentSearch.puuid);
+      renderMapStats(allMatches, currentSearch.puuid);
+    }
+  }catch(e){
+    setStatus($('matchListStatus'), `추가 전적을 불러오지 못했어요 (${e.message})`, 'err');
+  }finally{
+    matchesLoading = false;
+    updateLoadMoreUI();
+  }
+}
+$('loadMoreBtn').addEventListener('click', loadMoreMatches);
+$('modeFilter').addEventListener('change', renderMatchList);
+
+async function renderMatches(matches, myPuuid){
+  if(!matches.length){
+    $('matchList').innerHTML = `<div class="empty">해당하는 전적이 없어요.</div>`;
+    return;
+  }
+  const icons = await ensureAgentIcons();
+  const html = matches.map((m, idx) => {
+    const me = (m.players || []).find(p => p.puuid === myPuuid);
+    if(!me) return '';
+    const mapName = m.metadata?.map?.name || '알 수 없는 맵';
+    const modeName = getModeName(m);
+    const agentName = me.agent?.name || '?';
+    const k = me.stats?.kills ?? 0, d = me.stats?.deaths ?? 0, a = me.stats?.assists ?? 0;
+    const { resultLabel, resultClass, scoreText } = getMatchResult(m, me);
+    const icon = icons[agentName];
+    const matchId = m.metadata?.match_id;
+    return `
+      <div>
+        <div class="match-row ${resultClass}" data-idx="${idx}" data-matchid="${matchId || ''}" data-myid="${myPuuid}">
+          ${icon ? `<img class="m-agent-icon" src="${icon}" alt="">` : `<div class="m-agent-icon"></div>`}
+          <div class="m-mid">
+            <div class="m-map">${escapeHtml(mapName)}</div>
+            <div class="m-sub">${escapeHtml(agentName)} · ${escapeHtml(modeName)}</div>
+          </div>
+          <div class="m-score">${scoreText}</div>
+          <div class="m-kda">${k}/${d}/${a}<div class="d">K/D/A</div></div>
+          <div class="m-result ${resultClass}">${resultLabel}</div>
+        </div>
+        <div class="match-detail" id="detail-${idx}"></div>
+      </div>
+    `;
+  }).join('');
+  $('matchList').innerHTML = html || `<div class="empty">표시할 전적이 없어요.</div>`;
+
+  $('matchList').querySelectorAll('.match-row').forEach(row => {
+    row.addEventListener('click', () => toggleMatchDetail(row));
+  });
+}
+
+async function toggleMatchDetail(row){
+  const idx = row.dataset.idx;
+  const matchId = row.dataset.matchid;
+  const myId = row.dataset.myid;
+  const region = currentSearch?.region;
+  const headers = currentSearch?.headers;
+  const detailEl = $(`detail-${idx}`);
+  if(!detailEl) return;
+  const isOpen = detailEl.style.display === 'block';
+  if(isOpen){ detailEl.style.display = 'none'; return; }
+  if(!matchId){
+    detailEl.innerHTML = `<div class="empty">이 경기의 상세 정보를 가져올 수 없어요.</div>`;
+    detailEl.style.display = 'block';
+    return;
+  }
+  detailEl.style.display = 'block';
+  detailEl.innerHTML = `<div class="skeleton">킬피드 불러오는 중...</div>`;
+
+  try{
+    let detail = matchDetailCache[matchId];
+    if(!detail){
+      const res = await fetchJson(`https://api.henrikdev.xyz/valorant/v4/match/${region}/${matchId}`, headers);
+      detail = res.data;
+      matchDetailCache[matchId] = detail;
+    }
+    const kills = detail.kills || [];
+    if(!kills.length){
+      detailEl.innerHTML = `<div class="empty">킬피드 정보가 없어요.</div>`;
+      return;
+    }
+    // 라운드별로 그룹화해서 모든 라운드의 킬피드를 보여줌
+    const byRound = {};
+    kills.forEach(k => {
+      const r = (k.round != null) ? k.round : -1;
+      if(!byRound[r]) byRound[r] = [];
+      byRound[r].push(k);
+    });
+    const roundNums = Object.keys(byRound).map(Number).sort((a,b) => a - b);
+    detailEl.innerHTML = roundNums.map(r => {
+      const label = r >= 0 ? `라운드 ${r + 1}` : '라운드 정보 없음';
+      const lines = byRound[r].map(k => {
+        const killer = k.killer || {};
+        const victim = k.victim || {};
+        const killerIsMe = killer.puuid === myId;
+        const victimIsMe = victim.puuid === myId;
+        return `<div class="kill-line">
+          <span><b class="${killerIsMe ? 'k-you' : ''}">${escapeHtml(killer.name || '?')}</b> → <b class="${victimIsMe ? 'v-you' : ''}">${escapeHtml(victim.name || '?')}</b></span>
+        </div>`;
+      }).join('');
+      return `<div style="margin-bottom:10px;">
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11.5px;color:var(--amber);text-transform:uppercase;letter-spacing:0.05em;padding:4px 0;">${label}</div>
+        ${lines}
+      </div>`;
+    }).join('');
+  }catch(e){
+    detailEl.innerHTML = `<div class="empty">킬피드를 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+  }
+}
+
+// ---------------- 요원/맵 통계 ----------------
+function aggregate(matches, myPuuid, keyFn){
+  const map = {};
+  matches.forEach(m => {
+    const me = (m.players || []).find(p => p.puuid === myPuuid);
+    if(!me) return;
+    const key = keyFn(m, me);
+    if(!key) return;
+    if(!map[key]) map[key] = { games:0, wins:0, kills:0, deaths:0, assists:0 };
+    const { win } = getMatchResult(m, me);
+    map[key].games += 1;
+    if(win === true) map[key].wins += 1;
+    map[key].kills += me.stats?.kills ?? 0;
+    map[key].deaths += me.stats?.deaths ?? 0;
+    map[key].assists += me.stats?.assists ?? 0;
+  });
+  return map;
+}
+
+function winrateClass(wr){ return wr >= 50 ? 'wr-good' : 'wr-bad'; }
+
+function renderAgentStats(matches, myPuuid){
+  const map = aggregate(matches, myPuuid, (m, me) => me.agent?.name);
+  const rows = Object.entries(map).sort((a,b) => b[1].games - a[1].games);
+  if(!rows.length){ $('agentStats').innerHTML = `<div class="empty">통계를 계산할 데이터가 없어요.</div>`; return; }
+  $('agentStats').innerHTML = `
+    <table class="table">
+      <thead><tr><th>요원</th><th>경기</th><th>승률</th><th>평균 K/D/A</th></tr></thead>
+      <tbody>
+        ${rows.map(([agent, s]) => {
+          const wr = Math.round((s.wins / s.games) * 100);
+          const avgK = (s.kills / s.games).toFixed(1);
+          const avgD = (s.deaths / s.games).toFixed(1);
+          const avgA = (s.assists / s.games).toFixed(1);
+          return `<tr>
+            <td>${escapeHtml(agent)}</td>
+            <td class="num">${s.games}</td>
+            <td class="num ${winrateClass(wr)}">${wr}%</td>
+            <td class="num">${avgK}/${avgD}/${avgA}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderMapStats(matches, myPuuid){
+  const map = aggregate(matches, myPuuid, (m) => m.metadata?.map?.name);
+  const rows = Object.entries(map).sort((a,b) => b[1].games - a[1].games);
+  if(!rows.length){ $('mapStats').innerHTML = `<div class="empty">통계를 계산할 데이터가 없어요.</div>`; return; }
+  $('mapStats').innerHTML = `
+    <table class="table">
+      <thead><tr><th>맵</th><th>경기</th><th>승</th><th>패</th><th>승률</th></tr></thead>
+      <tbody>
+        ${rows.map(([mapName, s]) => {
+          const wr = Math.round((s.wins / s.games) * 100);
+          return `<tr>
+            <td>${escapeHtml(mapName)}</td>
+            <td class="num">${s.games}</td>
+            <td class="num">${s.wins}</td>
+            <td class="num">${s.games - s.wins}</td>
+            <td class="num ${winrateClass(wr)}">${wr}%</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ---------------- 여러 계정 비교 ----------------
+$('compareBtn').addEventListener('click', runCompare);
+
+async function runCompare(){
+  const apiKey = HENRIK_API_KEY;
+  const region = $('compareRegion').value;
+  const statusEl = $('compareStatus');
+  const lines = $('compareList').value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+
+  if(lines.length < 2){
+    setStatus(statusEl, 'Riot ID를 두 개 이상 입력해주세요 (한 줄에 하나씩).', 'err');
+    return;
+  }
+  const invalid = lines.filter(l => !l.includes('#'));
+  if(invalid.length){
+    setStatus(statusEl, `"이름#태그" 형식이 아닌 항목이 있어요: ${escapeHtml(invalid[0])}`, 'err');
+    return;
+  }
+
+  const headers = { 'Authorization': apiKey };
+  $('compareBtn').disabled = true;
+  $('compareResult').innerHTML = '';
+  setStatus(statusEl, '비교하는 중... (계정 수에 따라 시간이 걸릴 수 있어요)', 'info');
+
+  const results = [];
+  for(const line of lines){
+    const [name, tag] = line.split('#').map(s => s.trim());
+    try{
+      const accountRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v1/account/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, headers);
+      const account = accountRes.data;
+
+      let tierName = '-', rr = null;
+      try{
+        const mmrRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v3/mmr/${region}/pc/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, headers);
+        tierName = mmrRes.data?.current?.tier?.name || '언랭크';
+        rr = mmrRes.data?.current?.rr ?? null;
+      }catch(e){ tierName = '조회 불가'; }
+
+      let games = 0, wins = 0, kills = 0, deaths = 0, assists = 0;
+      try{
+        const matchesRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v4/matches/${region}/pc/${encodeURIComponent(name)}/${encodeURIComponent(tag)}?size=10`, headers);
+        (matchesRes.data || []).forEach(m => {
+          const me = (m.players || []).find(p => p.puuid === account.puuid);
+          if(!me) return;
+          const { win } = getMatchResult(m, me);
+          games += 1;
+          if(win === true) wins += 1;
+          kills += me.stats?.kills ?? 0;
+          deaths += me.stats?.deaths ?? 0;
+          assists += me.stats?.assists ?? 0;
+        });
+      }catch(e){ /* 전적 없이도 랭크 정보만 표시 */ }
+
+      results.push({
+        label: `${account.name}#${account.tag}`, level: account.account_level, tier: tierName, rr,
+        games, wins, kills, deaths, assists, ok: true
+      });
+    }catch(e){
+      results.push({ label: line, ok:false, error: e.message });
+    }
+  }
+
+  $('compareResult').innerHTML = `
+    <table class="table">
+      <thead><tr><th>계정</th><th>레벨</th><th>랭크</th><th>최근 10경기 승률</th><th>평균 K/D/A</th></tr></thead>
+      <tbody>
+        ${results.map(r => {
+          if(!r.ok){
+            return `<tr><td>${escapeHtml(r.label)}</td><td colspan="4" class="empty" style="padding:9px 10px;">조회 실패 (${escapeHtml(r.error)})</td></tr>`;
+          }
+          const wr = r.games ? Math.round((r.wins / r.games) * 100) : null;
+          const avg = r.games ? `${(r.kills/r.games).toFixed(1)}/${(r.deaths/r.games).toFixed(1)}/${(r.assists/r.games).toFixed(1)}` : '-';
+          return `<tr>
+            <td>${escapeHtml(r.label)}</td>
+            <td class="num">${r.level ?? '-'}</td>
+            <td>${escapeHtml(r.tier)}${r.rr != null ? ` (${r.rr} RR)` : ''}</td>
+            <td class="num ${wr != null ? winrateClass(wr) : ''}">${wr != null ? wr + '%' : '데이터 없음'}</td>
+            <td class="num">${avg}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+  setStatus(statusEl, '', '');
+  $('compareBtn').disabled = false;
+}
+
+// ---------------- 상점 (서버 공통 번들) ----------------
+$('storeBtn').addEventListener('click', loadStore);
+
+let bundleMetaMap = null;
+async function ensureBundleMeta(){
+  if(bundleMetaMap) return bundleMetaMap;
+  bundleMetaMap = {};
+  try{
+    const res = await fetch('https://valorant-api.com/v1/bundles?language=ko-KR');
+    const json = await res.json();
+    (json.data || []).forEach(b => {
+      if(b.uuid) bundleMetaMap[b.uuid.toLowerCase()] = b;
+    });
+  }catch(e){ /* 목록을 못 가져와도 개별 조회로 재시도함 */ }
+  return bundleMetaMap;
+}
+
+async function fetchBundleMetaById(id){
+  try{
+    const r = await fetch(`https://valorant-api.com/v1/bundles/${id}?language=ko-KR`);
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j.data || null;
+  }catch(e){ return null; }
+}
+
+function sumBundlePrice(bundle){
+  const items = bundle.Items || bundle.items || [];
+  let total = 0, hasDiscount = false;
+  items.forEach(it => {
+    const price = it.DiscountedPrice ?? it.discounted_price ?? it.BasePrice ?? it.base_price ?? 0;
+    const base = it.BasePrice ?? it.base_price ?? price;
+    total += price;
+    if(price < base) hasDiscount = true;
+  });
+  return { total, hasDiscount };
+}
+
+function formatRemaining(sec){
+  if(sec <= 0) return '곧 교체';
+  const d = Math.floor(sec / 86400);
+  const h = Math.floor((sec % 86400) / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if(d > 0) return `${d}일 ${h}시간 남음`;
+  if(h > 0) return `${h}시간 ${m}분 남음`;
+  return `${m}분 남음`;
+}
+
+async function loadStore(){
+  const apiKey = HENRIK_API_KEY;
+  const statusEl = $('storeStatus');
+  bundleTimers.forEach(t => clearInterval(t));
+  bundleTimers = [];
+  setStatus(statusEl, '불러오는 중...', 'info');
+  $('storeBtn').disabled = true;
+  $('bundleWrap').innerHTML = `<div class="skeleton pulse">번들 정보를 불러오는 중...</div>`;
+
+  try{
+    const res = await fetchJson('https://api.henrikdev.xyz/valorant/v1/store-featured', { 'Authorization': apiKey });
+    const fb = res.data?.FeaturedBundle || {};
+    let bundles = [];
+    if(Array.isArray(fb.Bundles) && fb.Bundles.length > 0) bundles = fb.Bundles;
+    else if(fb.Bundle) bundles = [fb.Bundle];
+    if(!bundles.length){
+      $('bundleWrap').innerHTML = `<div class="empty">현재 표시할 번들이 없어요.</div>`;
+      setStatus(statusEl, '', '');
+      return;
+    }
+
+    const metaMap = await ensureBundleMeta();
+    const metas = await Promise.all(bundles.map(async b => {
+      const id = b.DataAssetID || b.dataAssetID || b.ID || b.id || '';
+      let meta = id ? metaMap[String(id).toLowerCase()] : null;
+      if(!meta && id) meta = await fetchBundleMetaById(id);
+      const { total, hasDiscount } = sumBundlePrice(b);
+      return {
+        name: meta?.displayName || '이름 불명',
+        img: meta?.displayIcon || meta?.verticalPromoImage || null,
+        seconds: b.DurationRemainingInSeconds ?? fb.BundleRemainingDurationInSeconds ?? 0,
+        price: total,
+        hasDiscount
+      };
+    }));
+
+    $('bundleWrap').innerHTML = `<div class="bundle-grid">${
+      metas.map((m, i) => `
+        <div class="bundle-card">
+          <div class="bundle-img-wrap">
+            ${m.img ? `<img class="bundle-img" src="${m.img}" alt="">` : `<div class="bundle-img bundle-img-empty">이미지 없음</div>`}
+            ${m.hasDiscount ? `<span class="bundle-discount-tag">할인</span>` : ''}
+          </div>
+          <div class="bundle-body">
+            <div class="bundle-name">${escapeHtml(m.name)}</div>
+            ${m.price ? `<div class="bundle-price"><span class="vp-icon">VP</span> ${m.price.toLocaleString()}</div>` : ''}
+            <div class="bundle-timer" id="timer-${i}"></div>
+          </div>
+        </div>
+      `).join('')
+    }</div>`;
+
+    metas.forEach((m, i) => {
+      let remaining = m.seconds;
+      const el = () => $(`timer-${i}`);
+      const tick = () => {
+        if(el()){
+          el().textContent = formatRemaining(remaining);
+          el().className = 'bundle-timer' + (remaining > 86400 ? ' long' : '');
+        }
+        remaining -= 1;
+        if(remaining < 0) clearInterval(timerId);
+      };
+      tick();
+      const timerId = setInterval(tick, 1000);
+      bundleTimers.push(timerId);
+    });
+
+    setStatus(statusEl, '', '');
+  }catch(e){
+    $('bundleWrap').innerHTML = '';
+    setStatus(statusEl, `상점 정보를 불러오지 못했어요: ${e.message}`, 'err');
+  }finally{
+    $('storeBtn').disabled = false;
+  }
+}
+
+</script>
+</body>
+</html>
