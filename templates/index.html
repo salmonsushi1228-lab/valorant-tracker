@@ -57,6 +57,7 @@
   }
   .panel.accent-teal{ border-top-color:var(--teal); }
   .panel.accent-amber{ border-top-color:var(--amber); }
+  #rankCard{ border-top-color: var(--tier-color, var(--amber)); }
   .panel:hover{ box-shadow: 0 10px 30px rgba(0,0,0,0.36); }
   .panel + .panel{ margin-top:16px; }
 
@@ -129,10 +130,17 @@
   .rank-tier{ font-family:'Chakra Petch',sans-serif; font-size:20px; font-weight:700; }
   .rank-rr{ color:var(--muted); font-size:13px; margin-top:2px; }
   .rr-bar{ height:6px; background:#0D0F13; border:1px solid var(--line); margin-top:10px; overflow:hidden; }
-  .rr-fill{ height:100%; background:linear-gradient(90deg, var(--teal), #7CF3DA); transition: width .5s ease; }
+  .rr-fill{ height:100%; background:linear-gradient(90deg, var(--tier-color, var(--teal)), color-mix(in srgb, var(--tier-color, var(--teal)) 40%, #fff)); transition: width .5s ease; }
   .peak-line{ margin-top:12px; font-size:12.5px; color:var(--muted); }
   .peak-line b{ color:var(--text); font-weight:600; }
   .delta-pos{ color:var(--teal); } .delta-neg{ color:var(--red); }
+
+  .match-date-header{
+    display:flex; align-items:center; gap:10px; margin: 20px 0 8px 2px; color:var(--muted);
+    font-family:'Chakra Petch',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:0.04em;
+  }
+  .match-date-header:first-child{ margin-top:0; }
+  .match-date-header .line{ flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent); }
 
   .match-row{
     display:flex; align-items:center; gap:12px; padding: 12px 14px; border:1px solid var(--line);
@@ -180,11 +188,33 @@
 
   .bundle-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
   @media (max-width:640px){ .bundle-grid{ grid-template-columns:1fr; } }
+  .bundle-wrap{ display:flex; flex-direction:column; }
   .bundle-card{
-    border:1px solid var(--line); background:var(--panel-2); overflow:hidden;
+    border:1px solid var(--line); background:var(--panel-2); overflow:hidden; cursor:pointer;
     transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
   }
   .bundle-card:hover{ border-color:#3A3F47; transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
+  .bundle-card.open{ border-color:var(--amber); transform:none; box-shadow:0 8px 22px rgba(242,177,56,0.12); }
+  .bundle-click-hint{ font-size:11px; color:var(--muted); margin-top:6px; }
+  .bundle-detail{
+    display:none; border:1px solid var(--line); border-top:none; background:#0D0F13;
+    padding:12px 14px; font-size:12.5px; max-height:360px; overflow-y:auto;
+    animation: fadeUp .2s ease;
+  }
+  .bundle-item-row{
+    display:flex; align-items:center; gap:10px; padding:8px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .bundle-item-row:last-child{ border-bottom:none; }
+  .bundle-item-icon{
+    width:44px; height:44px; object-fit:contain; background:#14171C;
+    border:1px solid var(--line); flex-shrink:0;
+  }
+  .bundle-item-mid{ flex:1; min-width:0; }
+  .bundle-item-name{ font-weight:600; color:var(--text); font-size:13px; line-height:1.35; }
+  .bundle-item-type{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .bundle-item-price{ font-size:12px; color:var(--amber); white-space:nowrap; flex-shrink:0; }
+  .bundle-item-price .orig{ color:var(--muted); text-decoration:line-through; font-size:11px; margin-right:4px; }
   .bundle-img-wrap{ position:relative; overflow:hidden; }
   .bundle-img{ width:100%; height:130px; object-fit:cover; display:block; background:#0D0F13; transition: transform .3s ease; }
   .bundle-card:hover .bundle-img{ transform: scale(1.05); }
@@ -199,8 +229,23 @@
   }
   .bundle-body{ padding:12px 14px; }
   .bundle-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; }
-  .bundle-price{ margin-top:6px; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px; }
-  .vp-icon{ font-family:'Chakra Petch',sans-serif; font-size:10px; font-weight:700; color:var(--amber); border:1px solid rgba(242,177,56,0.5); padding:1px 5px; letter-spacing:0.03em; }
+  .bundle-price{
+    margin-top:10px; font-family:'Chakra Petch',sans-serif; font-weight:700;
+    font-size:22px; letter-spacing:0.02em; color:var(--text);
+    display:flex; align-items:center; gap:8px;
+  }
+  .vp-icon{
+    font-family:'Chakra Petch',sans-serif; font-size:12px; font-weight:700; color:#100608;
+    background:var(--amber); border:1px solid var(--amber); padding:3px 7px; letter-spacing:0.04em;
+  }
+  .store-subhead{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:14px; margin:18px 0 10px; }
+  .personal-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  @media (max-width:640px){ .personal-grid{ grid-template-columns:1fr; } }
+  .skin-card{ border:1px solid var(--line); background:var(--panel-2); overflow:hidden; }
+  .skin-card img{ width:100%; height:92px; object-fit:contain; background:#0D0F13; display:block; padding:8px; }
+  .skin-body{ padding:10px 12px 12px; }
+  .skin-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; line-height:1.3; }
+  .skin-meta{ margin-top:4px; font-size:12px; color:var(--muted); }
   .bundle-timer{ margin-top:8px; font-family:'Chakra Petch',sans-serif; font-size:13px; color:var(--red); letter-spacing:0.03em; }
   .bundle-timer.long{ color:var(--muted); }
 
@@ -209,6 +254,62 @@
   @keyframes pulse{ 0%,100%{ opacity:0.5; } 50%{ opacity:1; } }
   .empty{ color:var(--muted); font-size:13.5px; padding:10px 2px; }
   footer{ text-align:center; color:#4B5158; font-size:11.5px; margin-top:40px; line-height:1.8; }
+
+  /* ---- 매치 상세 팝업 (킬피드/팀 로스터) ---- */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(6,7,9,0.72); backdrop-filter: blur(2px);
+    z-index:1000; align-items:flex-start; justify-content:center; padding: 5vh 14px; overflow-y:auto;
+    animation: fadeUp .15s ease;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{
+    width:100%; max-width:760px; background:linear-gradient(180deg, var(--panel), var(--panel-2) 160%);
+    border:1px solid var(--line); border-top:2px solid var(--red); position:relative;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55); padding:24px 22px 22px; max-height:90vh; display:flex; flex-direction:column;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:transparent; border:1px solid var(--line); color:var(--muted);
+    width:30px; height:30px; cursor:pointer; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center;
+    clip-path: polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .modal-close:hover{ color:var(--red); border-color:var(--red); }
+  .modal-head{ margin-bottom:14px; padding-right:36px; }
+  .modal-head .m-map{ font-size:18px; }
+  .modal-head .m-sub{ font-size:12.5px; margin-top:3px; }
+  .modal-body{ overflow-y:auto; padding-right:4px; }
+
+  .roster-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+  @media (max-width:640px){ .roster-grid{ grid-template-columns:1fr; } }
+  .roster-col{ border:1px solid var(--line); background:var(--panel-2); padding:10px 12px; }
+  .roster-col.mine{ border-left:3px solid var(--teal); }
+  .roster-col.opp{ border-left:3px solid var(--red); }
+  .roster-col-head{
+    display:flex; align-items:center; justify-content:space-between; font-family:'Chakra Petch',sans-serif;
+    font-weight:700; font-size:12px; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:8px;
+  }
+  .roster-col.mine .roster-col-head{ color:var(--teal); }
+  .roster-col.opp .roster-col-head{ color:var(--red); }
+  .roster-player{ display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .roster-player:last-child{ border-bottom:none; }
+  .rp-icon{ width:26px; height:26px; border-radius:50%; background:#0D0F13; border:1px solid var(--line); object-fit:cover; flex-shrink:0; }
+  .rp-mid{ flex:1; min-width:0; }
+  .rp-name{ font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rp-name.me{ color:var(--teal); }
+  .rp-tier{ font-size:10.5px; margin-top:1px; font-weight:600; letter-spacing:0.02em; }
+  .rp-kda{ font-family:'Chakra Petch',sans-serif; font-size:12.5px; font-weight:700; text-align:right; white-space:nowrap; flex-shrink:0; }
+  .rp-kda .d{ color:var(--muted); font-weight:500; font-size:10px; margin-left:2px; }
+
+  .round-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .round-tab{
+    font-family:'Chakra Petch',sans-serif; font-size:11px; font-weight:600; color:var(--muted); background:transparent;
+    border:1px solid var(--line); padding:5px 10px; cursor:pointer; letter-spacing:0.03em;
+    clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .round-tab:hover{ color:var(--text); border-color:#3A3F47; }
+  .round-tab.active{ color:var(--amber); border-color:var(--amber); }
 </style>
 </head>
 <body>
@@ -259,7 +360,7 @@
     </div>
 
     <div class="section-head"><span class="num">02</span><h2>전적 기록</h2><div class="line"></div></div>
-    <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px 2px;">경기 행을 클릭하면 라운드별 킬피드를 볼 수 있어요</div>
+    <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px 2px;">경기 행을 클릭하면 팝업으로 양 팀 티어·KDA와 라운드별 킬피드를 볼 수 있어요</div>
     <div class="row2" style="margin-top:0;margin-bottom:14px;align-items:flex-end;">
       <div style="max-width:220px;">
         <div class="field-label">모드 필터</div>
@@ -305,17 +406,24 @@
   </div>
 
   <!-- 상점 -->
-  <div class="section-head"><span class="num">06</span><h2>상점</h2><div class="line"></div></div>
-  <div class="info-box">
-    <b>일일 상점 · 야시장은 계정별 개인 정보라 공개 API로 조회할 수 없어요.</b> 라이엇이 개인 로그인 세션 없이는 누구에게도 상점 데이터를 공개하지 않기 때문이에요. 대신 <b>지금 서버 전체에 떠 있는 번들(모두에게 동일)</b>과 <b>남은 기간</b>은 아래에서 확인할 수 있어요.
-  </div>
+  <div class="section-head"><span class="num">06</span><h2>상점 · 현재 번들</h2><div class="line"></div></div>
   <div class="panel accent-amber">
     <button class="ghost" id="storeBtn">현재 번들 불러오기</button>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px;">번들 카드를 클릭하면 포함된 스킨·아이템 목록을 볼 수 있어요</div>
     <div class="status" id="storeStatus"></div>
     <div id="bundleWrap" style="margin-top:14px;"></div>
   </div>
 
   <footer>Powered by HenrikDev API &amp; valorant-api.com · Riot Games와 무관한 비공식 커뮤니티 도구입니다</footer>
+</div>
+
+<!-- 매치 상세 팝업 -->
+<div class="modal-overlay" id="matchModalOverlay">
+  <div class="modal-box" id="matchModalBox">
+    <button class="modal-close" id="matchModalClose" aria-label="닫기">✕</button>
+    <div class="modal-head" id="matchModalHead"></div>
+    <div class="modal-body" id="matchModalBody"></div>
+  </div>
 </div>
 
 <script>
@@ -351,6 +459,35 @@ async function fetchJson(url, headers){
 function setStatus(el, msg, type){
   el.textContent = msg || '';
   el.className = 'status' + (type ? ' ' + type : '');
+}
+
+// ---------------- 공통: 경기 날짜 그룹핑 ----------------
+const WEEKDAY_KO = ['일','월','화','수','목','금','토'];
+
+function getMatchDate(m){
+  const raw = m.metadata?.started_at;
+  if(!raw) return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function getDateKey(d){
+  if(!d) return 'unknown';
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function formatDateHeader(d){
+  if(!d) return '날짜 미상';
+  const y = d.getFullYear();
+  const mo = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  const w = WEEKDAY_KO[d.getDay()];
+  const today = new Date();
+  const isToday = d.getFullYear()===today.getFullYear() && d.getMonth()===today.getMonth() && d.getDate()===today.getDate();
+  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  const isYesterday = d.getFullYear()===yesterday.getFullYear() && d.getMonth()===yesterday.getMonth() && d.getDate()===yesterday.getDate();
+  const label = isToday ? '오늘' : (isYesterday ? '어제' : `${w}요일`);
+  return `${y}. ${mo}. ${day} · ${label}`;
 }
 
 // ---------------- 공통: 경기 결과 판정 ----------------
@@ -421,6 +558,7 @@ async function runSearch(){
       const mmrRes = await fetchJson(`https://api.henrikdev.xyz/valorant/v3/mmr/${region}/pc/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, headers);
       renderRank(mmrRes.data);
     }catch(e){
+      $('rankCard').style.setProperty('--tier-color', getTierColor('언랭크'));
       $('rankCard').innerHTML = `<div class="field-label">랭크 정보</div><div class="empty">랭크 정보를 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
     }
 
@@ -468,6 +606,24 @@ function renderProfile(account, region){
   `;
 }
 
+function getTierColor(tierName){
+  const n = String(tierName || '').toLowerCase();
+  if(/radiant|레디언트/.test(n)) return '#F4E07A';
+  if(/immortal|불멸/.test(n)) return '#FF4655';
+  if(/ascendant|초월/.test(n)) return '#3DDC97';
+  if(/diamond|다이아/.test(n)) return '#D17BFF';
+  if(/platinum|플래티넘|플레티넘/.test(n)) return '#4CE0C3';
+  if(/gold|골드/.test(n)) return '#E8C547';
+  if(/silver|실버/.test(n)) return '#C5CDD4';
+  if(/bronze|브론즈/.test(n)) return '#C67B42';
+  if(/iron|아이언/.test(n)) return '#6B6F76';
+  return '#868D96';
+}
+
+function applyRankAccent(tierName){
+  $('rankCard').style.setProperty('--tier-color', getTierColor(tierName));
+}
+
 function renderRank(data){
   const cur = data.current || {};
   const peak = data.peak || {};
@@ -475,9 +631,11 @@ function renderRank(data){
   const change = cur.last_change ?? 0;
   const changeClass = change > 0 ? 'delta-pos' : (change < 0 ? 'delta-neg' : '');
   const changeSign = change > 0 ? '+' : '';
+  const tierName = cur.tier?.name || '언랭크';
+  applyRankAccent(tierName);
   $('rankCard').innerHTML = `
     <div class="field-label">현재 랭크</div>
-    <div class="rank-tier" style="margin-top:10px;">${escapeHtml(cur.tier?.name || '언랭크')}</div>
+    <div class="rank-tier" style="margin-top:10px;color:var(--tier-color)">${escapeHtml(tierName)}</div>
     <div class="rank-rr">RR ${rr} / 100 &nbsp;·&nbsp; 최근 변동 <span class="${changeClass}">${changeSign}${change}</span></div>
     <div class="rr-bar"><div class="rr-fill" style="width:${Math.max(0, Math.min(100, rr))}%"></div></div>
     <div class="peak-line">시즌 피크 <b>${escapeHtml(peak.tier?.name || '-')}</b></div>
@@ -569,6 +727,7 @@ async function renderMatches(matches, myPuuid){
     return;
   }
   const icons = await ensureAgentIcons();
+  let lastDateKey = null;
   const html = matches.map((m, idx) => {
     const me = (m.players || []).find(p => p.puuid === myPuuid);
     if(!me) return '';
@@ -579,47 +738,125 @@ async function renderMatches(matches, myPuuid){
     const { resultLabel, resultClass, scoreText } = getMatchResult(m, me);
     const icon = icons[agentName];
     const matchId = m.metadata?.match_id;
+
+    const matchDate = getMatchDate(m);
+    const dateKey = getDateKey(matchDate);
+    let dateHeaderHtml = '';
+    if(dateKey !== lastDateKey){
+      lastDateKey = dateKey;
+      dateHeaderHtml = `<div class="match-date-header">${escapeHtml(formatDateHeader(matchDate))}<div class="line"></div></div>`;
+    }
+
     return `
-      <div>
-        <div class="match-row ${resultClass}" data-idx="${idx}" data-matchid="${matchId || ''}" data-myid="${myPuuid}">
-          ${icon ? `<img class="m-agent-icon" src="${icon}" alt="">` : `<div class="m-agent-icon"></div>`}
-          <div class="m-mid">
-            <div class="m-map">${escapeHtml(mapName)}</div>
-            <div class="m-sub">${escapeHtml(agentName)} · ${escapeHtml(modeName)}</div>
-          </div>
-          <div class="m-score">${scoreText}</div>
-          <div class="m-kda">${k}/${d}/${a}<div class="d">K/D/A</div></div>
-          <div class="m-result ${resultClass}">${resultLabel}</div>
+      ${dateHeaderHtml}
+      <div class="match-row ${resultClass}" data-idx="${idx}" data-matchid="${matchId || ''}" data-myid="${myPuuid}">
+        ${icon ? `<img class="m-agent-icon" src="${icon}" alt="">` : `<div class="m-agent-icon"></div>`}
+        <div class="m-mid">
+          <div class="m-map">${escapeHtml(mapName)}</div>
+          <div class="m-sub">${escapeHtml(agentName)} · ${escapeHtml(modeName)}</div>
         </div>
-        <div class="match-detail" id="detail-${idx}"></div>
+        <div class="m-score">${scoreText}</div>
+        <div class="m-kda">${k}/${d}/${a}<div class="d">K/D/A</div></div>
+        <div class="m-result ${resultClass}">${resultLabel}</div>
       </div>
     `;
   }).join('');
   $('matchList').innerHTML = html || `<div class="empty">표시할 전적이 없어요.</div>`;
 
   $('matchList').querySelectorAll('.match-row').forEach(row => {
-    row.addEventListener('click', () => toggleMatchDetail(row));
+    row.addEventListener('click', () => openMatchModal(row, matches));
   });
 }
 
-async function toggleMatchDetail(row){
-  const idx = row.dataset.idx;
+// ---------------- 매치 상세 팝업 (팀 로스터 · 티어 · KDA · 킬피드) ----------------
+let currentModalKills = null; // 라운드 탭 전환용으로 캐시
+let currentModalMyId = null;
+
+function tierBadgeHtml(tierName){
+  const name = tierName || '언랭크';
+  return `<span class="rp-tier" style="color:${getTierColor(name)}">${escapeHtml(name)}</span>`;
+}
+
+function renderRosterCol(players, isMine, myId, icons){
+  const head = isMine ? '우리 팀' : '상대 팀';
+  const rows = players.map(p => {
+    const isMe = p.puuid === myId;
+    const nm = `${p.name || '?'}${p.tag ? '#' + p.tag : ''}`;
+    const agentName = p.agent?.name || '?';
+    const icon = icons[agentName];
+    const tierName = p.tier?.name || '언랭크';
+    const k = p.stats?.kills ?? 0, d = p.stats?.deaths ?? 0, a = p.stats?.assists ?? 0;
+    return `
+      <div class="roster-player">
+        ${icon ? `<img class="rp-icon" src="${icon}" alt="">` : `<div class="rp-icon"></div>`}
+        <div class="rp-mid">
+          <div class="rp-name ${isMe ? 'me' : ''}">${escapeHtml(nm)}</div>
+          ${tierBadgeHtml(tierName)}
+        </div>
+        <div class="rp-kda">${k}/${d}/${a}<span class="d">KDA</span></div>
+      </div>
+    `;
+  }).join('');
+  return `
+    <div class="roster-col ${isMine ? 'mine' : 'opp'}">
+      <div class="roster-col-head"><span>${head}</span><span>${players.length}명</span></div>
+      ${rows || `<div class="empty">플레이어 정보 없음</div>`}
+    </div>
+  `;
+}
+
+function renderKillfeedForRound(kills, myId, roundFilter){
+  const filtered = roundFilter === 'all' ? kills : kills.filter(k => (k.round != null ? k.round : -1) === roundFilter);
+  if(!filtered.length) return `<div class="empty">해당 라운드의 킬피드가 없어요.</div>`;
+  return filtered.map(k => {
+    const killer = k.killer || {};
+    const victim = k.victim || {};
+    const killerIsMe = killer.puuid === myId;
+    const victimIsMe = victim.puuid === myId;
+    return `<div class="kill-line">
+      <span><b class="${killerIsMe ? 'k-you' : ''}">${escapeHtml(killer.name || '?')}</b> → <b class="${victimIsMe ? 'v-you' : ''}">${escapeHtml(victim.name || '?')}</b></span>
+    </div>`;
+  }).join('');
+}
+
+function switchModalRound(roundVal){
+  $('matchModalOverlay').querySelectorAll('.round-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.round === String(roundVal));
+  });
+  const feedEl = $('modalKillfeed');
+  if(feedEl) feedEl.innerHTML = renderKillfeedForRound(currentModalKills || [], currentModalMyId, roundVal === 'all' ? 'all' : Number(roundVal));
+}
+
+function openMatchModal(row, matches){
+  const idx = Number(row.dataset.idx);
   const matchId = row.dataset.matchid;
   const myId = row.dataset.myid;
   const region = currentSearch?.region;
   const headers = currentSearch?.headers;
-  const detailEl = $(`detail-${idx}`);
-  if(!detailEl) return;
-  const isOpen = detailEl.style.display === 'block';
-  if(isOpen){ detailEl.style.display = 'none'; return; }
+  const m = matches[idx];
+
+  const overlay = $('matchModalOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const mapName = m?.metadata?.map?.name || '알 수 없는 맵';
+  const modeName = m ? getModeName(m) : '';
+  $('matchModalHead').innerHTML = `
+    <div class="m-map">${escapeHtml(mapName)}</div>
+    <div class="m-sub">${escapeHtml(modeName)}</div>
+  `;
+  $('matchModalBody').innerHTML = `<div class="skeleton pulse">경기 상세 정보를 불러오는 중...</div>`;
+
   if(!matchId){
-    detailEl.innerHTML = `<div class="empty">이 경기의 상세 정보를 가져올 수 없어요.</div>`;
-    detailEl.style.display = 'block';
+    $('matchModalBody').innerHTML = `<div class="empty">이 경기의 상세 정보를 가져올 수 없어요.</div>`;
     return;
   }
-  detailEl.style.display = 'block';
-  detailEl.innerHTML = `<div class="skeleton">킬피드 불러오는 중...</div>`;
 
+  loadMatchModalContent(matchId, myId, region, headers);
+}
+
+async function loadMatchModalContent(matchId, myId, region, headers){
+  const bodyEl = $('matchModalBody');
   try{
     let detail = matchDetailCache[matchId];
     if(!detail){
@@ -627,39 +864,59 @@ async function toggleMatchDetail(row){
       detail = res.data;
       matchDetailCache[matchId] = detail;
     }
+    const icons = await ensureAgentIcons();
+    const players = detail.players || [];
+    const mine = players.find(p => p.puuid === myId);
+    const myTeamId = mine?.team_id;
+    const myTeam = players.filter(p => p.team_id === myTeamId);
+    const oppTeam = players.filter(p => p.team_id !== myTeamId);
+
     const kills = detail.kills || [];
-    if(!kills.length){
-      detailEl.innerHTML = `<div class="empty">킬피드 정보가 없어요.</div>`;
-      return;
-    }
-    // 라운드별로 그룹화해서 모든 라운드의 킬피드를 보여줌
-    const byRound = {};
-    kills.forEach(k => {
-      const r = (k.round != null) ? k.round : -1;
-      if(!byRound[r]) byRound[r] = [];
-      byRound[r].push(k);
+    currentModalKills = kills;
+    currentModalMyId = myId;
+    const roundNums = Array.from(new Set(kills.map(k => (k.round != null ? k.round : -1)))).sort((a,b) => a - b);
+
+    const roundTabsHtml = kills.length
+      ? `<div class="round-tabs">
+          <button class="round-tab active" data-round="all">전체</button>
+          ${roundNums.map(r => `<button class="round-tab" data-round="${r}">${r >= 0 ? '라운드 ' + (r + 1) : '기타'}</button>`).join('')}
+        </div>`
+      : '';
+
+    bodyEl.innerHTML = `
+      <div class="roster-grid">
+        ${renderRosterCol(myTeam, true, myId, icons)}
+        ${renderRosterCol(oppTeam, false, myId, icons)}
+      </div>
+      <div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12.5px;color:var(--text);margin-bottom:8px;">킬피드</div>
+      ${roundTabsHtml}
+      <div id="modalKillfeed">${kills.length ? renderKillfeedForRound(kills, myId, 'all') : `<div class="empty">킬피드 정보가 없어요.</div>`}</div>
+    `;
+
+    bodyEl.querySelectorAll('.round-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const val = tab.dataset.round === 'all' ? 'all' : Number(tab.dataset.round);
+        switchModalRound(val);
+      });
     });
-    const roundNums = Object.keys(byRound).map(Number).sort((a,b) => a - b);
-    detailEl.innerHTML = roundNums.map(r => {
-      const label = r >= 0 ? `라운드 ${r + 1}` : '라운드 정보 없음';
-      const lines = byRound[r].map(k => {
-        const killer = k.killer || {};
-        const victim = k.victim || {};
-        const killerIsMe = killer.puuid === myId;
-        const victimIsMe = victim.puuid === myId;
-        return `<div class="kill-line">
-          <span><b class="${killerIsMe ? 'k-you' : ''}">${escapeHtml(killer.name || '?')}</b> → <b class="${victimIsMe ? 'v-you' : ''}">${escapeHtml(victim.name || '?')}</b></span>
-        </div>`;
-      }).join('');
-      return `<div style="margin-bottom:10px;">
-        <div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11.5px;color:var(--amber);text-transform:uppercase;letter-spacing:0.05em;padding:4px 0;">${label}</div>
-        ${lines}
-      </div>`;
-    }).join('');
   }catch(e){
-    detailEl.innerHTML = `<div class="empty">킬피드를 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+    bodyEl.innerHTML = `<div class="empty">경기 상세 정보를 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
   }
 }
+
+function closeMatchModal(){
+  $('matchModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalKills = null;
+  currentModalMyId = null;
+}
+$('matchModalClose').addEventListener('click', closeMatchModal);
+$('matchModalOverlay').addEventListener('click', (e) => {
+  if(e.target === $('matchModalOverlay')) closeMatchModal();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && $('matchModalOverlay').classList.contains('open')) closeMatchModal();
+});
 
 // ---------------- 요원/맵 통계 ----------------
 function aggregate(matches, myPuuid, keyFn){
@@ -821,6 +1078,96 @@ async function runCompare(){
 $('storeBtn').addEventListener('click', loadStore);
 
 let bundleMetaMap = null;
+let loadedBundles = [];
+const itemMetaCache = {};
+
+const ITEM_TYPE_ROUTES = {
+  'e7c63390-eda7-46e0-bb7a-a6abdacd2433': { path: 'weapons/skinlevels', label: '무기 스킨' },
+  '3ad1b2b2-acdb-4524-852f-954a76ddae0a': { path: 'weapons/skinchromas', label: '색상 변형' },
+  'dd3bf334-87f3-40bd-b043-682a57a8dc3a': { path: 'buddies', label: '총기 장식' },
+  'd5f120f8-ff8c-4aac-92ea-f2b5acbe9475': { path: 'sprays', label: '스프레이' },
+  '3f296c07-64c3-494c-923b-fe692a4fa1bd': { path: 'playercards', label: '플레이어 카드' },
+  'de7caa6b-adf7-4588-bbd1-143831e786c6': { path: 'playertitles', label: '플레이어 칭호' },
+};
+
+async function resolveStoreItem(typeId, itemId){
+  const key = `${typeId}:${itemId}`;
+  if(itemMetaCache[key]) return itemMetaCache[key];
+
+  const route = ITEM_TYPE_ROUTES[typeId];
+  let name = '이름 불명', icon = null;
+  if(route){
+    try{
+      const r = await fetch(`https://valorant-api.com/v1/${route.path}/${itemId}?language=ko-KR`);
+      if(r.ok){
+        const j = await r.json();
+        name = j.data?.displayName || name;
+        icon = j.data?.displayIcon || j.data?.smallArt || null;
+      }
+    }catch(e){ /* fallback below */ }
+  }
+  const result = { name, icon, typeLabel: route?.label || '아이템' };
+  itemMetaCache[key] = result;
+  return result;
+}
+
+function getBundleItems(bundle){
+  return bundle.Items || bundle.items || [];
+}
+
+function formatItemPrice(it){
+  const discounted = it.DiscountedPrice ?? it.discounted_price;
+  const base = it.BasePrice ?? it.base_price;
+  if(discounted == null && base == null) return '';
+  const price = discounted ?? base;
+  if(base != null && discounted != null && discounted < base){
+    return `<span class="orig">${Number(base).toLocaleString()}</span>${Number(discounted).toLocaleString()} VP`;
+  }
+  return `${Number(price).toLocaleString()} VP`;
+}
+
+async function toggleBundleDetail(cardEl){
+  const idx = cardEl.dataset.idx;
+  const detailEl = $(`bundle-detail-${idx}`);
+  if(!detailEl || !loadedBundles[idx]) return;
+
+  const isOpen = detailEl.style.display === 'block';
+  document.querySelectorAll('.bundle-card.open').forEach(c => c.classList.remove('open'));
+  document.querySelectorAll('.bundle-detail').forEach(d => { d.style.display = 'none'; });
+  if(isOpen) return;
+
+  cardEl.classList.add('open');
+  detailEl.style.display = 'block';
+  detailEl.innerHTML = `<div class="skeleton pulse">구성품 불러오는 중...</div>`;
+
+  try{
+    const items = getBundleItems(loadedBundles[idx]);
+    if(!items.length){
+      detailEl.innerHTML = `<div class="empty">구성품 정보가 없어요.</div>`;
+      return;
+    }
+    const resolved = await Promise.all(items.map(async it => {
+      const item = it.Item || it.item || {};
+      const typeId = item.ItemTypeID || item.itemTypeID || '';
+      const itemId = item.ItemID || item.itemID || '';
+      const meta = itemId ? await resolveStoreItem(typeId, itemId) : { name: '알 수 없음', icon: null, typeLabel: '아이템' };
+      return { ...meta, priceHtml: formatItemPrice(it) };
+    }));
+    detailEl.innerHTML = resolved.map(r => `
+      <div class="bundle-item-row">
+        ${r.icon ? `<img class="bundle-item-icon" src="${r.icon}" alt="">` : `<div class="bundle-item-icon"></div>`}
+        <div class="bundle-item-mid">
+          <div class="bundle-item-name">${escapeHtml(r.name)}</div>
+          <div class="bundle-item-type">${escapeHtml(r.typeLabel)}</div>
+        </div>
+        ${r.priceHtml ? `<div class="bundle-item-price">${r.priceHtml}</div>` : ''}
+      </div>
+    `).join('');
+  }catch(e){
+    detailEl.innerHTML = `<div class="empty">구성품을 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+  }
+}
+
 async function ensureBundleMeta(){
   if(bundleMetaMap) return bundleMetaMap;
   bundleMetaMap = {};
@@ -870,6 +1217,8 @@ async function loadStore(){
   const statusEl = $('storeStatus');
   bundleTimers.forEach(t => clearInterval(t));
   bundleTimers = [];
+  loadedBundles = [];
+  document.querySelectorAll('.bundle-card.open').forEach(c => c.classList.remove('open'));
   setStatus(statusEl, '불러오는 중...', 'info');
   $('storeBtn').disabled = true;
   $('bundleWrap').innerHTML = `<div class="skeleton pulse">번들 정보를 불러오는 중...</div>`;
@@ -886,36 +1235,47 @@ async function loadStore(){
       return;
     }
 
+    loadedBundles = bundles;
     const metaMap = await ensureBundleMeta();
     const metas = await Promise.all(bundles.map(async b => {
       const id = b.DataAssetID || b.dataAssetID || b.ID || b.id || '';
       let meta = id ? metaMap[String(id).toLowerCase()] : null;
       if(!meta && id) meta = await fetchBundleMetaById(id);
       const { total, hasDiscount } = sumBundlePrice(b);
+      const itemCount = getBundleItems(b).length;
       return {
         name: meta?.displayName || '이름 불명',
         img: meta?.displayIcon || meta?.verticalPromoImage || null,
         seconds: b.DurationRemainingInSeconds ?? fb.BundleRemainingDurationInSeconds ?? 0,
         price: total,
-        hasDiscount
+        hasDiscount,
+        itemCount
       };
     }));
 
     $('bundleWrap').innerHTML = `<div class="bundle-grid">${
       metas.map((m, i) => `
-        <div class="bundle-card">
-          <div class="bundle-img-wrap">
-            ${m.img ? `<img class="bundle-img" src="${m.img}" alt="">` : `<div class="bundle-img bundle-img-empty">이미지 없음</div>`}
-            ${m.hasDiscount ? `<span class="bundle-discount-tag">할인</span>` : ''}
+        <div class="bundle-wrap">
+          <div class="bundle-card" data-idx="${i}">
+            <div class="bundle-img-wrap">
+              ${m.img ? `<img class="bundle-img" src="${m.img}" alt="">` : `<div class="bundle-img bundle-img-empty">이미지 없음</div>`}
+              ${m.hasDiscount ? `<span class="bundle-discount-tag">할인</span>` : ''}
+            </div>
+            <div class="bundle-body">
+              <div class="bundle-name">${escapeHtml(m.name)}</div>
+              ${m.price ? `<div class="bundle-price"><span class="vp-icon">VP</span> ${m.price.toLocaleString()}</div>` : ''}
+              ${m.itemCount ? `<div class="bundle-click-hint">${m.itemCount}개 아이템 · 클릭하여 구성품 보기</div>` : ''}
+              <div class="bundle-timer" id="timer-${i}"></div>
+            </div>
           </div>
-          <div class="bundle-body">
-            <div class="bundle-name">${escapeHtml(m.name)}</div>
-            ${m.price ? `<div class="bundle-price"><span class="vp-icon">VP</span> ${m.price.toLocaleString()}</div>` : ''}
-            <div class="bundle-timer" id="timer-${i}"></div>
-          </div>
+          <div class="bundle-detail" id="bundle-detail-${i}"></div>
         </div>
       `).join('')
     }</div>`;
+
+    $('bundleWrap').querySelectorAll('.bundle-card').forEach(card => {
+      card.addEventListener('click', () => toggleBundleDetail(card));
+    });
 
     metas.forEach((m, i) => {
       let remaining = m.seconds;
@@ -941,6 +1301,8 @@ async function loadStore(){
     $('storeBtn').disabled = false;
   }
 }
+
+
 
 </script>
 </body>
