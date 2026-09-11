@@ -3,337 +3,391 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>발로란트 트래커</title>
+<title>VALORANT TRACKER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #0A0C0F;
-    --panel: #14171C;
-    --panel-2: #191D23;
-    --line: #262B32;
-    --red: #FF4655;
+    --bg: #0A0C10;
+    --panel: #14171D;
+    --panel-2: #191D24;
+    --line: #262B33;
+    --red: #B084F5;
     --teal: #4CE0C3;
     --amber: #F2B138;
     --text: #ECE8E1;
     --muted: #868D96;
     --cut: 10px;
+    --sidebar-w: 236px;
   }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; background:var(--bg); }
   body{
-    font-family:'Inter', sans-serif; color: var(--text); padding: 28px 16px 60px; min-height:100vh;
+    font-family:'Inter', sans-serif; color: var(--text); min-height:100vh;
     background:
-      radial-gradient(1200px 600px at 50% -10%, rgba(255,70,85,0.08), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(76,224,195,0.05), transparent 55%),
+      radial-gradient(1000px 500px at 90% -10%, rgba(176,132,245,0.10), transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, rgba(76,224,195,0.05), transparent 55%),
       var(--bg);
   }
-  ::selection{ background:var(--red); color:#100608; }
+  ::selection{ background:var(--red); color:#100618; }
   ::-webkit-scrollbar{ width:8px; height:8px; }
   ::-webkit-scrollbar-track{ background:#0D0F13; }
   ::-webkit-scrollbar-thumb{ background:#31363E; border-radius:0; }
   ::-webkit-scrollbar-thumb:hover{ background:#454B54; }
-  .wrap{ max-width: 900px; margin: 0 auto; }
 
-  .brandline{ display:flex; align-items:center; gap:12px; margin-bottom: 4px; }
-  .brandline .bar{ width:5px; height:26px; background:var(--red); box-shadow:0 0 14px rgba(255,70,85,0.75); animation: barpulse 2.2s ease-in-out infinite; }
-  @keyframes barpulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
-  h1{ font-family:'Chakra Petch', sans-serif; font-weight:700; font-size: clamp(24px,5vw,34px); letter-spacing:0.5px; margin:0;
-    background:linear-gradient(90deg, var(--text) 55%, var(--red)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .tagline{ color:var(--muted); font-size:13.5px; margin: 6px 0 16px 17px; }
-  .hero{ margin-bottom:22px; }
-  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-left:17px; }
-  .chip{
-    font-family:'Chakra Petch',sans-serif; font-size:11.5px; font-weight:600; letter-spacing:0.03em;
-    color:var(--teal); border:1px solid rgba(76,224,195,0.35); background:rgba(76,224,195,0.06);
-    padding:5px 11px; clip-path: polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+  html{ scroll-behavior:smooth; }
+
+  /* ---- 앱 셸: 좌측 고정 사이드바 + 메인 ---- */
+  .app-shell{ display:flex; min-height:100vh; }
+  .sidebar{
+    width:var(--sidebar-w); flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh;
+    border-right:1px solid var(--line); background:linear-gradient(180deg, #0D0F14, #0A0C10);
+    padding:22px 16px; display:flex; flex-direction:column; gap:26px; overflow-y:auto;
   }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 4px; }
+  .brand .bar{ width:5px; height:24px; background:var(--red); box-shadow:0 0 14px rgba(176,132,245,0.75); animation: barpulse 2.2s ease-in-out infinite; }
+  @keyframes barpulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
+  .brand h1{ font-family:'Chakra Petch', sans-serif; font-weight:700; font-size:16px; margin:0; letter-spacing:0.3px; line-height:1.25; }
+  .brand .sub{ font-size:10.5px; color:var(--muted); margin-top:2px; }
 
-  .panel{
+  .side-nav{ display:flex; flex-direction:column; gap:2px; }
+  .side-nav a{
+    display:flex; align-items:center; gap:10px; color:var(--muted); text-decoration:none; font-size:13px; font-weight:600;
+    padding:10px 12px; border-left:2px solid transparent; transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .side-nav a .n{ font-family:'Chakra Petch',sans-serif; font-size:10.5px; color:#4B5158; }
+  .side-nav a:hover{ color:var(--text); background:rgba(255,255,255,0.03); }
+  .side-nav a.hot{ color:var(--red); border-left-color:var(--red); }
+
+  .side-foot{ margin-top:auto; font-size:10.5px; color:#4B5158; line-height:1.7; padding:0 4px; }
+
+  .main{ flex:1; min-width:0; padding: 26px 30px 60px; max-width:1180px; }
+
+  .topbar{
+    display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;
     background:linear-gradient(180deg, var(--panel), var(--panel-2) 140%); border:1px solid var(--line);
-    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-    padding: 22px; position:relative; transition: border-color .2s ease, box-shadow .2s ease;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.28); border-top:2px solid var(--red);
+    border-top:2px solid var(--red); padding:16px 18px; margin-bottom:26px;
   }
-  .panel.accent-teal{ border-top-color:var(--teal); }
-  .panel.accent-amber{ border-top-color:var(--amber); }
-  #rankCard{ border-top-color: var(--tier-color, var(--amber)); }
-  .panel:hover{ box-shadow: 0 10px 30px rgba(0,0,0,0.36); }
-  .panel + .panel{ margin-top:16px; }
-
-  .search-grid{ display:grid; grid-template-columns: 1fr 110px; gap:10px; }
-  .field-label{ font-size:11.5px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+  .topbar .tf{ flex:2; min-width:180px; }
+  .topbar .tf.small{ flex:0 0 130px; min-width:110px; }
+  .field-label{ font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
   input, select, textarea{
     width:100%; background:#0D0F13; border:1px solid var(--line); color:var(--text);
-    padding:11px 12px; font-family:'Inter',sans-serif; font-size:14.5px; outline:none;
-    clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+    padding:10px 12px; font-family:'Inter',sans-serif; font-size:14px; outline:none;
     transition: border-color .15s ease, box-shadow .15s ease;
   }
   select{ cursor:pointer; }
   textarea{ resize:vertical; min-height:84px; font-family:'Inter',sans-serif; line-height:1.6; }
-  input:focus, select:focus, textarea:focus{ border-color:var(--red); box-shadow:0 0 0 3px rgba(255,70,85,0.12); }
+  input:focus, select:focus, textarea:focus{ border-color:var(--red); box-shadow:0 0 0 3px rgba(176,132,245,0.15); }
   input::placeholder, textarea::placeholder{ color:#4B5158; }
-  .row2{ display:flex; gap:10px; margin-top:12px; }
-  .row2 > div{ flex:1; }
-  .apikey-note{ font-size:12px; color:var(--muted); margin-top:10px; line-height:1.6; }
-  .apikey-note a{ color:var(--teal); text-decoration:none; }
-  .apikey-note a:hover{ text-decoration:underline; }
+  .apikey-note{ flex-basis:100%; font-size:11.5px; color:var(--muted); margin-top:2px; line-height:1.6; }
 
   button.primary{
-    margin-top:14px; width:100%; background:linear-gradient(135deg, var(--red), #C22E3B); color:#100608; border:none;
-    font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; letter-spacing:0.06em; padding:14px; cursor:pointer;
-    text-transform:uppercase;
-    clip-path: polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+    background:linear-gradient(135deg, var(--red), #7A4FCB); color:#100618; border:none;
+    font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.05em; padding:11px 20px; cursor:pointer;
+    text-transform:uppercase; flex:0 0 auto; height:41px;
     transition: filter .15s ease, transform .1s ease, box-shadow .2s ease;
-    box-shadow: 0 6px 18px rgba(255,70,85,0.22);
+    box-shadow: 0 6px 18px rgba(176,132,245,0.22);
   }
-  button.primary:hover{ filter:brightness(1.08); box-shadow: 0 4px 22px rgba(255,70,85,0.28); }
-  button.primary:active{ transform: scale(0.995); }
+  button.primary:hover{ filter:brightness(1.08); }
+  button.primary:active{ transform: scale(0.985); }
   button.primary:disabled{ background:#3A3E44; color:#7d8288; cursor:not-allowed; box-shadow:none; }
 
   button.ghost{
     background:transparent; border:1px solid var(--line); color:var(--text);
     font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:13px; padding:9px 16px; cursor:pointer;
-    clip-path: polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
     transition: border-color .15s ease, color .15s ease, transform .1s ease;
   }
   button.ghost:hover{ border-color:var(--teal); color:var(--teal); }
   button.ghost:active{ transform: scale(0.98); }
   button.ghost:disabled{ opacity:0.5; cursor:not-allowed; }
 
-  .status{ font-size:13.5px; margin-top:14px; padding-top:2px; }
-  .status.err{ color:var(--red); }
+  .status{ font-size:13px; margin-top:10px; flex-basis:100%; }
+  .status.err{ color:#FF6B7A; }
   .status.info{ color:var(--muted); }
 
-  .section-head{ display:flex; align-items:center; gap:10px; margin: 34px 0 14px 2px; }
-  .section-head .num{
-    font-family:'Chakra Petch',sans-serif; color:var(--red); font-weight:700; font-size:12px;
-    border:1px solid var(--red); padding:3px 7px; letter-spacing:0.03em;
-    clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+  .panel{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2) 140%); border:1px solid var(--line);
+    padding: 20px; position:relative; border-top:2px solid var(--red);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28);
   }
-  .section-head h2{ font-family:'Chakra Petch',sans-serif; font-size:17px; font-weight:600; letter-spacing:0.03em; margin:0; }
+  .panel.accent-teal{ border-top-color:var(--teal); }
+  .panel.accent-amber{ border-top-color:var(--amber); }
+  #rankCard{ border-top-color: var(--tier-color, var(--amber)); }
+  .panel + .panel{ margin-top:14px; }
+
+  .section-head{ display:flex; align-items:center; gap:10px; margin: 30px 0 14px 2px; }
+  .section-head .num{
+    font-family:'Chakra Petch',sans-serif; color:var(--red); font-weight:700; font-size:11px;
+    border:1px solid var(--red); padding:3px 7px; letter-spacing:0.03em;
+  }
+  .section-head h2{ font-family:'Chakra Petch',sans-serif; font-size:16px; font-weight:600; letter-spacing:0.03em; margin:0; }
   .section-head .line{ flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent); }
 
-  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-  @media (max-width:640px){ .grid2{ grid-template-columns: 1fr; } .search-grid{ grid-template-columns: 1fr; } }
+  /* 프로필+랭크: 사이드바 레이아웃에선 3:2 비율 */
+  .grid2{ display:grid; grid-template-columns: 3fr 2fr; gap:14px; }
+  @media (max-width:900px){ .grid2{ grid-template-columns: 1fr; } }
+
+  /* 요원/맵 통계를 나란히 배치 */
+  .stats-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+  @media (max-width:900px){ .stats-row{ grid-template-columns:1fr; } }
 
   #results{ animation: fadeUp .35s ease; }
   @keyframes fadeUp{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
 
   .profile-top{ display:flex; gap:14px; align-items:center; }
-  .card-art{ width:64px; height:64px; object-fit:cover; border:1px solid var(--line); flex-shrink:0; }
-  .p-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:19px; line-height:1.2; }
-  .p-tag{ color:var(--muted); font-size:14px; }
-  .p-meta{ margin-top:6px; font-size:12.5px; color:var(--muted); }
+  .card-art{ width:60px; height:60px; object-fit:cover; border:1px solid var(--line); flex-shrink:0; }
+  .p-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:18px; line-height:1.2; }
+  .p-tag{ color:var(--muted); font-size:13.5px; }
+  .p-meta{ margin-top:6px; font-size:12px; color:var(--muted); }
   .badge{ display:inline-block; font-size:11px; padding:2px 8px; border:1px solid var(--line); color:var(--teal); margin-top:8px; letter-spacing:0.05em; }
 
-  .rank-tier{ font-family:'Chakra Petch',sans-serif; font-size:20px; font-weight:700; }
-  .rank-rr{ color:var(--muted); font-size:13px; margin-top:2px; }
+  .rank-tier{ font-family:'Chakra Petch',sans-serif; font-size:19px; font-weight:700; }
+  .rank-rr{ color:var(--muted); font-size:12.5px; margin-top:2px; }
   .rr-bar{ height:6px; background:#0D0F13; border:1px solid var(--line); margin-top:10px; overflow:hidden; }
   .rr-fill{ height:100%; background:linear-gradient(90deg, var(--tier-color, var(--teal)), color-mix(in srgb, var(--tier-color, var(--teal)) 40%, #fff)); transition: width .5s ease; }
-  .peak-line{ margin-top:12px; font-size:12.5px; color:var(--muted); }
+  .peak-line{ margin-top:12px; font-size:12px; color:var(--muted); }
   .peak-line b{ color:var(--text); font-weight:600; }
-  .delta-pos{ color:var(--teal); } .delta-neg{ color:var(--red); }
+  .delta-pos{ color:var(--teal); } .delta-neg{ color:#FF6B7A; }
 
   .match-date-header{
-    display:flex; align-items:center; gap:10px; margin: 20px 0 8px 2px; color:var(--muted);
-    font-family:'Chakra Petch',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:0.04em;
+    display:flex; align-items:center; gap:10px; margin: 18px 0 8px 2px; color:var(--muted);
+    font-family:'Chakra Petch',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.04em;
   }
   .match-date-header:first-child{ margin-top:0; }
   .match-date-header .line{ flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent); }
 
   .match-row{
-    display:flex; align-items:center; gap:12px; padding: 12px 14px; border:1px solid var(--line);
-    background:var(--panel-2); margin-bottom:8px; cursor:pointer;
+    display:flex; align-items:center; gap:12px; padding: 11px 14px; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel-2); margin-bottom:7px; cursor:pointer;
     transition: border-color .15s ease, transform .12s ease, background .15s ease;
   }
-  .match-row:hover{ border-color:#3A3F47; background:#1D2129; transform: translateX(2px); }
+  .match-row:hover{ border-color:#4A3F6A; background:#1D1F29; transform: translateX(3px); }
   .match-row.win{ border-left:3px solid var(--teal); }
-  .match-row.loss{ border-left:3px solid var(--red); }
+  .match-row.loss{ border-left:3px solid #FF6B7A; }
   .match-row.draw{ border-left:3px solid var(--muted); }
-  .m-agent-icon{ width:38px; height:38px; border-radius:50%; background:#0D0F13; border:1px solid var(--line); object-fit:cover; flex-shrink:0; }
+  .m-agent-icon{ width:36px; height:36px; border-radius:50%; background:#0D0F13; border:1px solid var(--line); object-fit:cover; flex-shrink:0; }
   .m-mid{ flex:1; min-width:0; }
-  .m-map{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:14.5px; }
-  .m-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
-  .m-kda{ font-family:'Chakra Petch',sans-serif; font-size:15px; font-weight:600; text-align:right; white-space:nowrap; }
-  .m-kda .d{ color:var(--muted); font-weight:500; font-size:12.5px; }
-  .m-score{ width:56px; text-align:right; font-size:12.5px; color:var(--muted); flex-shrink:0; }
-  .m-result{ width:44px; text-align:center; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.04em; flex-shrink:0; }
-  .m-result.win{ color:var(--teal); } .m-result.loss{ color:var(--red); } .m-result.draw{ color:var(--muted); }
+  .m-map{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:14px; }
+  .m-sub{ color:var(--muted); font-size:11.5px; margin-top:2px; }
+  .m-kda{ font-family:'Chakra Petch',sans-serif; font-size:14.5px; font-weight:600; text-align:right; white-space:nowrap; }
+  .m-kda .d{ color:var(--muted); font-weight:500; font-size:12px; }
+  .m-score{ width:52px; text-align:right; font-size:12px; color:var(--muted); flex-shrink:0; }
+  .m-result{ width:42px; text-align:center; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:11.5px; letter-spacing:0.04em; flex-shrink:0; }
+  .m-result.win{ color:var(--teal); } .m-result.loss{ color:#FF6B7A; } .m-result.draw{ color:var(--muted); }
 
   .match-detail{
     display:none; border:1px solid var(--line); border-top:none; background:#0D0F13;
-    margin-top:-8px; margin-bottom:8px; padding:12px 14px; font-size:12.5px; max-height:420px; overflow-y:auto;
-    animation: fadeUp .2s ease;
+    margin-top:-7px; margin-bottom:7px; padding:12px 14px; font-size:12.5px; max-height:420px; overflow-y:auto;
+    animation: fadeUp .2s ease; border-radius:0 0 8px 8px;
   }
   .kill-line{ display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); color:var(--muted); }
   .kill-line b{ color:var(--text); font-weight:600; }
   .kill-line .k-you{ color:var(--teal); }
-  .kill-line .v-you{ color:var(--red); }
+  .kill-line .v-you{ color:#FF6B7A; }
 
-  .table{ width:100%; border-collapse:collapse; font-size:13.5px; }
-  .table th{ text-align:left; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .table th{ text-align:left; color:var(--muted); font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; padding:8px 10px; border-bottom:1px solid var(--line); }
   .table td{ padding:9px 10px; border-bottom:1px solid var(--line); }
   .table tr{ transition: background .12s ease; }
   .table tbody tr:hover{ background:rgba(255,255,255,0.02); }
   .table tr:last-child td{ border-bottom:none; }
   .table td.num{ font-family:'Chakra Petch',sans-serif; font-weight:600; }
-  .wr-good{ color:var(--teal); } .wr-bad{ color:var(--red); }
+  .wr-good{ color:var(--teal); } .wr-bad{ color:#FF6B7A; }
 
   .info-box{
     border:1px solid var(--amber); background: rgba(242,177,56,0.07); padding:14px 16px; font-size:13px; line-height:1.7; color:#E9CE94;
-    clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); margin-bottom:16px;
+    margin-bottom:16px;
   }
   .info-box b{ color:var(--amber); }
 
-  .bundle-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
-  @media (max-width:640px){ .bundle-grid{ grid-template-columns:1fr; } }
+  .bundle-grid{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+  @media (max-width:900px){ .bundle-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:600px){ .bundle-grid{ grid-template-columns:1fr; } }
   .bundle-wrap{ display:flex; flex-direction:column; }
   .bundle-card{
-    border:1px solid var(--line); background:var(--panel-2); overflow:hidden; cursor:pointer;
+    border:1px solid var(--line); background:var(--panel-2); overflow:hidden; cursor:pointer; border-radius:8px 8px 0 0;
     transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
   }
-  .bundle-card:hover{ border-color:#3A3F47; transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
+  .bundle-card:hover{ border-color:#4A3F6A; transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
   .bundle-card.open{ border-color:var(--amber); transform:none; box-shadow:0 8px 22px rgba(242,177,56,0.12); }
-  .bundle-click-hint{ font-size:11px; color:var(--muted); margin-top:6px; }
+  .bundle-click-hint{ font-size:10.5px; color:var(--muted); margin-top:6px; }
   .bundle-detail{
     display:none; border:1px solid var(--line); border-top:none; background:#0D0F13;
-    padding:12px 14px; font-size:12.5px; max-height:360px; overflow-y:auto;
-    animation: fadeUp .2s ease;
+    padding:12px 14px; font-size:12px; max-height:360px; overflow-y:auto;
+    animation: fadeUp .2s ease; border-radius:0 0 8px 8px;
   }
-  .bundle-item-row{
-    display:flex; align-items:center; gap:10px; padding:8px 0;
-    border-bottom:1px dashed var(--line);
-  }
+  .bundle-item-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line); }
   .bundle-item-row:last-child{ border-bottom:none; }
-  .bundle-item-icon{
-    width:44px; height:44px; object-fit:contain; background:#14171C;
-    border:1px solid var(--line); flex-shrink:0;
-  }
+  .bundle-item-icon{ width:40px; height:40px; object-fit:contain; background:#14171C; border:1px solid var(--line); flex-shrink:0; }
   .bundle-item-mid{ flex:1; min-width:0; }
-  .bundle-item-name{ font-weight:600; color:var(--text); font-size:13px; line-height:1.35; }
-  .bundle-item-type{ font-size:11px; color:var(--muted); margin-top:2px; }
-  .bundle-item-price{ font-size:12px; color:var(--amber); white-space:nowrap; flex-shrink:0; }
-  .bundle-item-price .orig{ color:var(--muted); text-decoration:line-through; font-size:11px; margin-right:4px; }
+  .bundle-item-name{ font-weight:600; color:var(--text); font-size:12.5px; line-height:1.35; }
+  .bundle-item-type{ font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .bundle-item-price{ font-size:11.5px; color:var(--amber); white-space:nowrap; flex-shrink:0; }
+  .bundle-item-price .orig{ color:var(--muted); text-decoration:line-through; font-size:10.5px; margin-right:4px; }
   .bundle-img-wrap{ position:relative; overflow:hidden; }
-  .bundle-img{ width:100%; height:130px; object-fit:cover; display:block; background:#0D0F13; transition: transform .3s ease; }
+  .bundle-img{ width:100%; height:110px; object-fit:cover; display:block; background:#0D0F13; transition: transform .3s ease; }
   .bundle-card:hover .bundle-img{ transform: scale(1.05); }
-  .bundle-img-empty{ display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; height:130px; }
-  .bundle-img-wrap::after{
-    content:''; position:absolute; left:0; right:0; bottom:0; height:44px;
-    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.55)); pointer-events:none;
-  }
-  .bundle-discount-tag{
-    position:absolute; top:8px; right:8px; background:var(--red); color:#100608; font-family:'Chakra Petch',sans-serif;
-    font-weight:700; font-size:10.5px; letter-spacing:0.04em; padding:3px 8px; z-index:1;
-  }
-  .bundle-body{ padding:12px 14px; }
-  .bundle-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; }
-  .bundle-price{
-    margin-top:10px; font-family:'Chakra Petch',sans-serif; font-weight:700;
-    font-size:22px; letter-spacing:0.02em; color:var(--text);
-    display:flex; align-items:center; gap:8px;
-  }
-  .vp-icon{
-    font-family:'Chakra Petch',sans-serif; font-size:12px; font-weight:700; color:#100608;
-    background:var(--amber); border:1px solid var(--amber); padding:3px 7px; letter-spacing:0.04em;
-  }
-  .store-subhead{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:14px; margin:18px 0 10px; }
-  .personal-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-  @media (max-width:640px){ .personal-grid{ grid-template-columns:1fr; } }
-  .skin-card{ border:1px solid var(--line); background:var(--panel-2); overflow:hidden; }
-  .skin-card img{ width:100%; height:92px; object-fit:contain; background:#0D0F13; display:block; padding:8px; }
-  .skin-body{ padding:10px 12px 12px; }
-  .skin-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; line-height:1.3; }
-  .skin-meta{ margin-top:4px; font-size:12px; color:var(--muted); }
-  .bundle-timer{ margin-top:8px; font-family:'Chakra Petch',sans-serif; font-size:13px; color:var(--red); letter-spacing:0.03em; }
+  .bundle-img-empty{ display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; height:110px; }
+  .bundle-img-wrap::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:40px; background:linear-gradient(180deg, transparent, rgba(0,0,0,0.55)); pointer-events:none; }
+  .bundle-discount-tag{ position:absolute; top:8px; right:8px; background:var(--red); color:#100618; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:10px; letter-spacing:0.04em; padding:3px 8px; z-index:1; }
+  .bundle-body{ padding:11px 13px; }
+  .bundle-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; }
+  .bundle-price{ margin-top:9px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:19px; letter-spacing:0.02em; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .vp-icon{ font-family:'Chakra Petch',sans-serif; font-size:11px; font-weight:700; color:#100618; background:var(--amber); border:1px solid var(--amber); padding:3px 7px; letter-spacing:0.04em; }
+  .store-subhead{ font-family:'Chakra Petch',sans-serif; font-weight:600; font-size:13.5px; margin:16px 0 10px; }
+  .personal-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width:900px){ .personal-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:600px){ .personal-grid{ grid-template-columns:1fr; } }
+  .skin-card{ border:1px solid var(--line); background:var(--panel-2); overflow:hidden; border-radius:6px; }
+  .skin-card img{ width:100%; height:88px; object-fit:contain; background:#0D0F13; display:block; padding:8px; }
+  .skin-body{ padding:9px 11px 11px; }
+  .skin-name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13.5px; line-height:1.3; }
+  .skin-meta{ margin-top:4px; font-size:11.5px; color:var(--muted); }
+  .bundle-timer{ margin-top:8px; font-family:'Chakra Petch',sans-serif; font-size:12.5px; color:var(--red); letter-spacing:0.03em; }
   .bundle-timer.long{ color:var(--muted); }
 
-  .skeleton{ color:var(--muted); font-size:13.5px; padding: 6px 2px; }
+  .skeleton{ color:var(--muted); font-size:13px; padding: 6px 2px; }
   .skeleton.pulse{ animation: pulse 1.3s ease-in-out infinite; }
   @keyframes pulse{ 0%,100%{ opacity:0.5; } 50%{ opacity:1; } }
-  .empty{ color:var(--muted); font-size:13.5px; padding:10px 2px; }
-  footer{ text-align:center; color:#4B5158; font-size:11.5px; margin-top:40px; line-height:1.8; }
+  .empty{ color:var(--muted); font-size:13px; padding:10px 2px; }
+  footer{ text-align:center; color:#4B5158; font-size:11px; margin-top:36px; line-height:1.8; }
 
-  /* ---- 매치 상세 팝업 (킬피드/팀 로스터) ---- */
+  /* ---- 최근 검색 칩 ---- */
+  .recent-chips{ display:flex; gap:8px; flex-wrap:wrap; flex-basis:100%; margin-top:2px; }
+  .recent-chip{
+    background:#0D0F13; border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:5px 10px;
+    cursor:pointer; transition: border-color .15s ease, color .15s ease; border-radius:20px;
+  }
+  .recent-chip:hover{ border-color:var(--red); color:var(--text); }
+
+  /* ---- 폼 요약 패널 ---- */
+  .form-summary{ display:flex; gap:10px; flex-wrap:wrap; align-items:stretch; }
+  .form-stat{
+    flex:1; min-width:110px; background:#0D0F13; border:1px solid var(--line); padding:12px 14px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .form-stat .fs-label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+  .form-stat .fs-value{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:20px; }
+  .streak-badge{
+    display:inline-block; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:12px;
+    padding:4px 10px; border-radius:20px; letter-spacing:0.03em;
+  }
+  .streak-badge.win{ background:rgba(76,224,195,0.14); color:var(--teal); border:1px solid rgba(76,224,195,0.4); }
+  .streak-badge.loss{ background:rgba(255,107,122,0.14); color:#FF6B7A; border:1px solid rgba(255,107,122,0.4); }
+
+  /* ---- MVP 크라운 / 파티 표시 ---- */
+  .rp-rank.mvp{ color:var(--amber); font-size:14px; }
+  .rp-party{
+    display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; flex-shrink:0;
+    vertical-align:middle;
+  }
+  .rp-name-wrap{ display:flex; align-items:center; gap:0; }
+
+  /* ---- RR 변동 그래프 ---- */
+  .rr-chart-svg{ width:100%; height:auto; display:block; }
+  .rr-chart-tip{ font-size:11px; color:var(--muted); margin-top:8px; }
+  .rr-legend{ display:flex; gap:14px; font-size:11px; color:var(--muted); margin-bottom:10px; }
+  .rr-legend span{ display:flex; align-items:center; gap:5px; }
+  .rr-legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
   .modal-overlay{
-    display:none; position:fixed; inset:0; background:rgba(6,7,9,0.72); backdrop-filter: blur(2px);
+    display:none; position:fixed; inset:0; background:rgba(6,7,10,0.72); backdrop-filter: blur(2px);
     z-index:1000; align-items:flex-start; justify-content:center; padding: 5vh 14px; overflow-y:auto;
     animation: fadeUp .15s ease;
   }
   .modal-overlay.open{ display:flex; }
   .modal-box{
     width:100%; max-width:760px; background:linear-gradient(180deg, var(--panel), var(--panel-2) 160%);
-    border:1px solid var(--line); border-top:2px solid var(--red); position:relative;
-    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    border:1px solid var(--line); border-top:2px solid var(--red); position:relative; border-radius:12px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.55); padding:24px 22px 22px; max-height:90vh; display:flex; flex-direction:column;
   }
   .modal-close{
     position:absolute; top:14px; right:16px; background:transparent; border:1px solid var(--line); color:var(--muted);
     width:30px; height:30px; cursor:pointer; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center;
-    clip-path: polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
-    transition: color .15s ease, border-color .15s ease;
+    border-radius:50%; transition: color .15s ease, border-color .15s ease;
   }
   .modal-close:hover{ color:var(--red); border-color:var(--red); }
-  .modal-head{ margin-bottom:14px; padding-right:36px; }
-  .modal-head .m-map{ font-size:18px; }
-  .modal-head .m-sub{ font-size:12.5px; margin-top:3px; }
+  .modal-head{ margin-bottom:14px; padding-right:36px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .modal-head .m-map{ font-size:17px; }
+  .modal-head .m-sub{ font-size:12px; margin-top:3px; }
+  .modal-head-score{ text-align:right; flex-shrink:0; }
+  .modal-head-score .score-num{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:22px; letter-spacing:0.04em; }
+  .modal-head-score .score-num.win{ color:var(--teal); }
+  .modal-head-score .score-num.loss{ color:#FF6B7A; }
+  .modal-head-score .score-result{ font-size:11px; color:var(--muted); margin-top:2px; text-transform:uppercase; letter-spacing:0.05em; }
   .modal-body{ overflow-y:auto; padding-right:4px; }
 
   .roster-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
   @media (max-width:640px){ .roster-grid{ grid-template-columns:1fr; } }
-  .roster-col{ border:1px solid var(--line); background:var(--panel-2); padding:10px 12px; }
+  .roster-col{ border:1px solid var(--line); background:var(--panel-2); padding:10px 12px; border-radius:8px; }
   .roster-col.mine{ border-left:3px solid var(--teal); }
-  .roster-col.opp{ border-left:3px solid var(--red); }
-  .roster-col-head{
-    display:flex; align-items:center; justify-content:space-between; font-family:'Chakra Petch',sans-serif;
-    font-weight:700; font-size:12px; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:8px;
-  }
+  .roster-col.opp{ border-left:3px solid #FF6B7A; }
+  .roster-col-head{ display:flex; align-items:center; justify-content:space-between; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:8px; }
   .roster-col.mine .roster-col-head{ color:var(--teal); }
-  .roster-col.opp .roster-col-head{ color:var(--red); }
+  .roster-col.opp .roster-col-head{ color:#FF6B7A; }
   .roster-player{ display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--line); }
   .roster-player:last-child{ border-bottom:none; }
+  .rp-rank{ width:16px; flex-shrink:0; font-family:'Chakra Petch',sans-serif; font-size:11px; font-weight:700; color:var(--muted); text-align:center; }
   .rp-icon{ width:26px; height:26px; border-radius:50%; background:#0D0F13; border:1px solid var(--line); object-fit:cover; flex-shrink:0; }
   .rp-mid{ flex:1; min-width:0; }
-  .rp-name{ font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rp-name{ font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rp-name.me{ color:var(--teal); }
-  .rp-tier{ font-size:10.5px; margin-top:1px; font-weight:600; letter-spacing:0.02em; }
-  .rp-kda{ font-family:'Chakra Petch',sans-serif; font-size:12.5px; font-weight:700; text-align:right; white-space:nowrap; flex-shrink:0; }
+  .rp-tier{ font-size:10px; margin-top:1px; font-weight:600; letter-spacing:0.02em; }
+  .rp-kda{ font-family:'Chakra Petch',sans-serif; font-size:12px; font-weight:700; text-align:right; white-space:nowrap; flex-shrink:0; }
   .rp-kda .d{ color:var(--muted); font-weight:500; font-size:10px; margin-left:2px; }
 
   .round-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
   .round-tab{
-    font-family:'Chakra Petch',sans-serif; font-size:11px; font-weight:600; color:var(--muted); background:transparent;
-    border:1px solid var(--line); padding:5px 10px; cursor:pointer; letter-spacing:0.03em;
-    clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+    font-family:'Chakra Petch',sans-serif; font-size:10.5px; font-weight:600; color:var(--muted); background:transparent;
+    border:1px solid var(--line); padding:5px 10px; cursor:pointer; letter-spacing:0.03em; border-radius:5px;
     transition: color .12s ease, border-color .12s ease;
   }
-  .round-tab:hover{ color:var(--text); border-color:#3A3F47; }
+  .round-tab:hover{ color:var(--text); border-color:#4A3F6A; }
   .round-tab.active{ color:var(--amber); border-color:var(--amber); }
+
+  @media (max-width:820px){
+    .sidebar{ position:relative; height:auto; width:100%; flex-direction:row; align-items:center; overflow-x:auto; padding:14px 16px; }
+    .side-nav{ flex-direction:row; }
+    .side-foot{ display:none; }
+    .app-shell{ flex-direction:column; }
+    .main{ padding:20px 16px 50px; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app-shell">
 
-  <div class="hero">
-    <div class="brandline"><div class="bar"></div><h1>발로란트 트래커</h1></div>
-    <div class="tagline">Riot ID로 전적 · 랭크 · 요원/맵 통계 · 현재 상점 번들을 조회합니다</div>
-    <div class="chip-row">
-      <span class="chip">전적 기록</span>
-      <span class="chip">랭크 추적</span>
-      <span class="chip">요원 · 맵 통계</span>
-      <span class="chip">상점 번들</span>
-    </div>
-  </div>
-
-  <!-- 검색 -->
-  <div class="panel accent-red">
-    <div class="search-grid">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="bar"></div>
       <div>
+        <h1>발로란트 트래커</h1>
+        <div class="sub">사이드바 대시보드</div>
+      </div>
+    </div>
+    <nav class="side-nav">
+      <a href="#sec-search" class="hot"><span class="n">01</span>&nbsp; 검색</a>
+      <a href="#sec-matches"><span class="n">02</span>&nbsp; 전적 기록</a>
+      <a href="#sec-agent"><span class="n">03</span>&nbsp; 요원 통계</a>
+      <a href="#sec-map"><span class="n">04</span>&nbsp; 맵 승률</a>
+      <a href="#sec-weapon"><span class="n">05</span>&nbsp; 무기 통계</a>
+      <a href="#sec-rr"><span class="n">06</span>&nbsp; RR 변동</a>
+      <a href="#sec-rivals"><span class="n">07</span>&nbsp; 자주 만난 상대</a>
+      <a href="#sec-compare"><span class="n">08</span>&nbsp; 계정 비교</a>
+      <a href="#sec-store"><span class="n">09</span>&nbsp; 상점</a>
+    </nav>
+    <div class="side-foot">Powered by HenrikDev API &amp; valorant-api.com<br>Riot Games와 무관한 비공식 도구</div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar" id="sec-search">
+      <div class="tf">
         <div class="field-label">Riot ID</div>
         <input id="riotName" placeholder="이름#태그  (예: Henrik3#VALO)">
       </div>
-      <div>
+      <div class="tf small">
         <div class="field-label">지역</div>
         <select id="region">
           <option value="kr">한국</option>
@@ -344,77 +398,107 @@
           <option value="br">브라질</option>
         </select>
       </div>
-    </div>
-    <div class="apikey-note">
-      이 트래커는 커뮤니티 API인 <b>HenrikDev API</b>를 사용해요. API 키는 코드 안에 미리 설정되어 있어요.
-    </div>
-    <button class="primary" id="searchBtn">전적 조회</button>
-    <div class="status" id="status"></div>
-  </div>
-
-  <!-- 결과 -->
-  <div id="results" style="display:none;">
-    <div class="grid2">
-      <div class="panel accent-teal" id="profileCard"></div>
-      <div class="panel accent-amber" id="rankCard"></div>
+      <button class="primary" id="searchBtn">전적 조회</button>
+      <div class="apikey-note">이 트래커는 커뮤니티 API인 <b>HenrikDev API</b>를 사용해요. API 키는 코드 안에 미리 설정되어 있어요.</div>
+      <div class="recent-chips" id="recentChips"></div>
+      <div class="status" id="status"></div>
     </div>
 
-    <div class="section-head"><span class="num">02</span><h2>전적 기록</h2><div class="line"></div></div>
-    <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px 2px;">경기 행을 클릭하면 팝업으로 양 팀 티어·KDA와 라운드별 킬피드를 볼 수 있어요</div>
-    <div class="row2" style="margin-top:0;margin-bottom:14px;align-items:flex-end;">
-      <div style="max-width:220px;">
-        <div class="field-label">모드 필터</div>
-        <select id="modeFilter"><option value="">전체 모드</option></select>
+    <div id="results" style="display:none;">
+      <div class="grid2">
+        <div class="panel accent-teal" id="profileCard"></div>
+        <div class="panel accent-amber" id="rankCard"></div>
       </div>
-      <div style="flex:0 0 auto;font-size:12px;color:var(--muted);padding-bottom:11px;" id="matchCountLabel"></div>
-    </div>
-    <div id="matchList"></div>
-    <div style="text-align:center;margin-top:12px;">
-      <button class="ghost" id="loadMoreBtn" style="display:none;">더 불러오기</button>
-    </div>
-    <div class="status" id="matchListStatus"></div>
 
-    <div class="section-head"><span class="num">03</span><h2>요원별 통계</h2><div class="line"></div></div>
-    <div class="panel"><div id="agentStats"></div></div>
+      <div class="panel" style="margin-top:14px;" id="formSummaryCard"></div>
 
-    <div class="section-head"><span class="num">04</span><h2>맵별 승률</h2><div class="line"></div></div>
-    <div class="panel"><div id="mapStats"></div></div>
-    <div style="font-size:11.5px;color:var(--muted);margin-top:8px;" id="statsFootnote">※ 요원/맵 통계는 현재까지 불러온 전적 기준이에요</div>
-  </div>
+      <div class="section-head" id="sec-matches"><span class="num">02</span><h2>전적 기록</h2><div class="line"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px 2px;">경기 행을 클릭하면 팝업으로 양 팀 티어·KDA와 라운드별 킬피드를 볼 수 있어요</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="max-width:220px;flex:1;min-width:160px;">
+          <div class="field-label">모드 필터</div>
+          <select id="modeFilter"><option value="">전체 모드</option></select>
+        </div>
+        <div style="max-width:220px;flex:1;min-width:160px;">
+          <div class="field-label">맵 필터</div>
+          <select id="mapFilter"><option value="">전체 맵</option></select>
+        </div>
+        <div style="max-width:220px;flex:1;min-width:160px;">
+          <div class="field-label">요원 필터</div>
+          <select id="agentFilter"><option value="">전체 요원</option></select>
+        </div>
+        <div style="flex:0 0 auto;font-size:12px;color:var(--muted);padding-bottom:11px;" id="matchCountLabel"></div>
+      </div>
+      <div id="matchList"></div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="ghost" id="loadMoreBtn" style="display:none;">더 불러오기</button>
+      </div>
+      <div class="status" id="matchListStatus"></div>
 
-  <!-- 계정 비교 -->
-  <div class="section-head"><span class="num">05</span><h2>여러 계정 비교</h2><div class="line"></div></div>
-  <div class="panel accent-teal">
-    <div class="field-label">Riot ID 목록 (한 줄에 하나씩, 최대 4개)</div>
-    <textarea id="compareList" placeholder="Henrik3#VALO&#10;Ryumin#ELI&#10;..."></textarea>
-    <div class="row2">
-      <div>
-        <div class="field-label">지역 (전체 동일 적용)</div>
-        <select id="compareRegion">
-          <option value="kr">한국</option>
-          <option value="ap">아시아</option>
-          <option value="na">북미</option>
-          <option value="eu">유럽</option>
-          <option value="latam">남미</option>
-          <option value="br">브라질</option>
-        </select>
+      <div class="stats-row">
+        <div>
+          <div class="section-head" id="sec-agent"><span class="num">03</span><h2>요원별 통계</h2><div class="line"></div></div>
+          <div class="panel">
+            <div id="agentStats"></div>
+            <div id="roleStats" style="margin-top:16px;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-head" id="sec-map"><span class="num">04</span><h2>맵별 승률</h2><div class="line"></div></div>
+          <div class="panel"><div id="mapStats"></div></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;" id="statsFootnote">※ 요원/맵 통계는 현재까지 불러온 전적 기준이에요</div>
+
+      <div class="section-head" id="sec-weapon"><span class="num">05</span><h2>무기 통계</h2><div class="line"></div></div>
+      <div class="panel">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">경기 상세 팝업을 열어본 경기들의 킬피드를 기준으로 집계돼요</div>
+        <div id="weaponStats"></div>
+      </div>
+
+      <div class="section-head" id="sec-rr"><span class="num">06</span><h2>RR 변동 그래프</h2><div class="line"></div></div>
+      <div class="panel accent-amber">
+        <div id="rrChartWrap"><div class="empty">랭크 정보를 불러오는 중...</div></div>
+      </div>
+
+      <div class="section-head" id="sec-rivals"><span class="num">07</span><h2>자주 만난 상대</h2><div class="line"></div></div>
+      <div class="panel">
+        <div id="rivalStats"></div>
       </div>
     </div>
-    <button class="primary" id="compareBtn">계정 비교하기</button>
-    <div class="status" id="compareStatus"></div>
-    <div id="compareResult" style="margin-top:14px;"></div>
-  </div>
 
-  <!-- 상점 -->
-  <div class="section-head"><span class="num">06</span><h2>상점 · 현재 번들</h2><div class="line"></div></div>
-  <div class="panel accent-amber">
-    <button class="ghost" id="storeBtn">현재 번들 불러오기</button>
-    <div style="font-size:12px;color:var(--muted);margin-top:10px;">번들 카드를 클릭하면 포함된 스킨·아이템 목록을 볼 수 있어요</div>
-    <div class="status" id="storeStatus"></div>
-    <div id="bundleWrap" style="margin-top:14px;"></div>
-  </div>
+    <div class="section-head" id="sec-compare"><span class="num">08</span><h2>여러 계정 비교</h2><div class="line"></div></div>
+    <div class="panel accent-teal">
+      <div class="field-label">Riot ID 목록 (한 줄에 하나씩, 최대 4개)</div>
+      <textarea id="compareList" placeholder="Henrik3#VALO&#10;Ryumin#ELI&#10;..."></textarea>
+      <div class="row2" style="display:flex;gap:10px;margin-top:12px;">
+        <div style="flex:1;">
+          <div class="field-label">지역 (전체 동일 적용)</div>
+          <select id="compareRegion">
+            <option value="kr">한국</option>
+            <option value="ap">아시아</option>
+            <option value="na">북미</option>
+            <option value="eu">유럽</option>
+            <option value="latam">남미</option>
+            <option value="br">브라질</option>
+          </select>
+        </div>
+      </div>
+      <button class="primary" id="compareBtn" style="margin-top:14px;width:100%;">계정 비교하기</button>
+      <div class="status" id="compareStatus"></div>
+      <div id="compareResult" style="margin-top:14px;"></div>
+    </div>
 
-  <footer>Powered by HenrikDev API &amp; valorant-api.com · Riot Games와 무관한 비공식 커뮤니티 도구입니다</footer>
+    <div class="section-head" id="sec-store"><span class="num">09</span><h2>상점 · 현재 번들</h2><div class="line"></div></div>
+    <div class="panel accent-amber">
+      <button class="ghost" id="storeBtn">현재 번들 불러오기</button>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;">번들 카드를 클릭하면 포함된 스킨·아이템 목록을 볼 수 있어요</div>
+      <div class="status" id="storeStatus"></div>
+      <div id="bundleWrap" style="margin-top:14px;"></div>
+    </div>
+
+    <footer>Made by JihooLee &amp; valorant-api.com · Riot Games와 무관한 비공식 커뮤니티 도구입니다</footer>
+  </main>
 </div>
 
 <!-- 매치 상세 팝업 -->
@@ -440,6 +524,56 @@ let matchesExhausted = false;
 let matchesLoading = false;
 const MATCH_BATCH_SIZE = 20; // 한 번에 불러올 경기 수 (화면 기준)
 const API_MAX_SIZE = 10; // HenrikDev API가 요청당 허용하는 최대 size
+
+// 요원 -> 역할군 매핑 (기준: 2026년 초 로스터)
+const ROLE_MAP = {
+  'Jett':'듀얼리스트', 'Phoenix':'듀얼리스트', 'Reyna':'듀얼리스트', 'Raze':'듀얼리스트',
+  'Yoru':'듀얼리스트', 'Neon':'듀얼리스트', 'Iso':'듀얼리스트', 'Waylay':'듀얼리스트',
+  'Sova':'이니시에이터', 'Breach':'이니시에이터', 'Skye':'이니시에이터', 'KAY/O':'이니시에이터',
+  'Fade':'이니시에이터', 'Gekko':'이니시에이터', 'Tejo':'이니시에이터',
+  'Brimstone':'컨트롤러', 'Omen':'컨트롤러', 'Viper':'컨트롤러', 'Astra':'컨트롤러',
+  'Harbor':'컨트롤러', 'Clove':'컨트롤러',
+  'Sage':'센티넬', 'Cypher':'센티넬', 'Killjoy':'센티넬', 'Chamber':'센티넬',
+  'Deadlock':'센티넬', 'Vyse':'센티넬'
+};
+function getAgentRole(agentName){ return ROLE_MAP[agentName] || '기타'; }
+
+// 무기 통계 집계 (열어본 매치 상세 기준)
+let weaponAgg = {}; // { weaponName: kills }
+let weaponAggMatchIds = new Set(); // 이미 집계에 반영한 matchId (중복 집계 방지)
+
+// 최근 검색 (localStorage)
+const RECENT_SEARCH_KEY = 'valtracker_recent_searches';
+function loadRecentSearches(){
+  try{ return JSON.parse(localStorage.getItem(RECENT_SEARCH_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function saveRecentSearch(riotId, region){
+  let list = loadRecentSearches().filter(it => !(it.riotId === riotId && it.region === region));
+  list.unshift({ riotId, region });
+  list = list.slice(0, 8);
+  try{ localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(list)); }catch(e){ /* 저장 실패해도 무시 */ }
+  renderRecentChips();
+}
+function renderRecentChips(){
+  const list = loadRecentSearches();
+  const wrap = $('recentChips');
+  if(!wrap) return;
+  if(!list.length){ wrap.innerHTML = ''; return; }
+  const regionLabel = { kr:'한국', ap:'아시아', na:'북미', eu:'유럽', latam:'남미', br:'브라질' };
+  wrap.innerHTML = list.map(it => `
+    <button type="button" class="recent-chip" data-riotid="${escapeHtml(it.riotId)}" data-region="${escapeHtml(it.region)}">
+      ${escapeHtml(it.riotId)} · ${escapeHtml(regionLabel[it.region] || it.region)}
+    </button>
+  `).join('');
+  wrap.querySelectorAll('.recent-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('riotName').value = btn.dataset.riotid;
+      $('region').value = btn.dataset.region;
+      runSearch();
+    });
+  });
+}
 
 function escapeHtml(s){
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -501,8 +635,8 @@ function getMatchResult(m, me){
     else if(myTeam.won === false || myTeam.has_won === false) win = false;
     resultLabel = win === true ? '승리' : (win === false ? '패배' : '-');
     resultClass = win === true ? 'win' : (win === false ? 'loss' : 'draw');
-    const myRounds = myTeam.rounds_won ?? myTeam.roundsWon;
-    const oppRounds = oppTeam?.rounds_won ?? oppTeam?.roundsWon;
+    const myRounds = myTeam.rounds?.won ?? myTeam.rounds_won ?? myTeam.roundsWon;
+    const oppRounds = oppTeam?.rounds?.won ?? oppTeam?.rounds_won ?? oppTeam?.roundsWon;
     if(myRounds != null && oppRounds != null) scoreText = `${myRounds}-${oppRounds}`;
   }
   return { win, resultLabel, resultClass, scoreText };
@@ -564,15 +698,25 @@ async function runSearch(){
 
     allMatches = [];
     matchesExhausted = false;
+    weaponAgg = {};
+    weaponAggMatchIds = new Set();
     currentSearch = { region, name, tag, headers, puuid: account.puuid };
+    saveRecentSearch(`${name}#${tag}`, region);
+    loadRRHistory(region, account.puuid, headers);
     try{
       const chunk = await fetchMatchesBatch(region, name, tag, headers, 0, MATCH_BATCH_SIZE);
       allMatches = chunk;
       if(chunk.length < MATCH_BATCH_SIZE) matchesExhausted = true;
       populateModeFilter();
+      populateMapFilter();
+      populateAgentFilter();
       await renderMatchList();
       renderAgentStats(allMatches, account.puuid);
       renderMapStats(allMatches, account.puuid);
+      renderRoleStats(allMatches, account.puuid);
+      renderFormSummary(allMatches, account.puuid);
+      renderRivalStats(allMatches, account.puuid);
+      renderWeaponStats();
       updateLoadMoreUI();
     }catch(e){
       $('matchList').innerHTML = `<div class="empty">최근 전적을 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
@@ -666,9 +810,40 @@ function populateModeFilter(){
   if(modes.includes(prev)) sel.value = prev;
 }
 
+function populateMapFilter(){
+  const sel = $('mapFilter');
+  const prev = sel.value;
+  const maps = Array.from(new Set(allMatches.map(m => m.metadata?.map?.name).filter(Boolean))).sort();
+  sel.innerHTML = `<option value="">전체 맵</option>` + maps.map(mp => `<option value="${escapeHtml(mp)}">${escapeHtml(mp)}</option>`).join('');
+  if(maps.includes(prev)) sel.value = prev;
+}
+
+function populateAgentFilter(){
+  const sel = $('agentFilter');
+  const prev = sel.value;
+  const puuid = currentSearch?.puuid;
+  const agents = Array.from(new Set(allMatches.map(m => {
+    const me = (m.players || []).find(p => p.puuid === puuid);
+    return me?.agent?.name;
+  }).filter(Boolean))).sort();
+  sel.innerHTML = `<option value="">전체 요원</option>` + agents.map(ag => `<option value="${escapeHtml(ag)}">${escapeHtml(ag)}</option>`).join('');
+  if(agents.includes(prev)) sel.value = prev;
+}
+
 function getFilteredMatches(){
   const modeVal = $('modeFilter').value;
-  return modeVal ? allMatches.filter(m => getModeName(m) === modeVal) : allMatches;
+  const mapVal = $('mapFilter').value;
+  const agentVal = $('agentFilter').value;
+  const puuid = currentSearch?.puuid;
+  return allMatches.filter(m => {
+    if(modeVal && getModeName(m) !== modeVal) return false;
+    if(mapVal && m.metadata?.map?.name !== mapVal) return false;
+    if(agentVal){
+      const me = (m.players || []).find(p => p.puuid === puuid);
+      if((me?.agent?.name) !== agentVal) return false;
+    }
+    return true;
+  });
 }
 
 async function renderMatchList(){
@@ -676,7 +851,8 @@ async function renderMatchList(){
   await renderMatches(filtered, currentSearch.puuid);
   const total = allMatches.length;
   const shown = filtered.length;
-  $('matchCountLabel').textContent = $('modeFilter').value
+  const filterActive = $('modeFilter').value || $('mapFilter').value || $('agentFilter').value;
+  $('matchCountLabel').textContent = filterActive
     ? `${shown}경기 표시 중 (전체 ${total}경기 불러옴)`
     : `${total}경기 불러옴`;
 }
@@ -707,9 +883,14 @@ async function loadMoreMatches(){
     if(chunk.length){
       allMatches = allMatches.concat(chunk);
       populateModeFilter();
+      populateMapFilter();
+      populateAgentFilter();
       await renderMatchList();
       renderAgentStats(allMatches, currentSearch.puuid);
       renderMapStats(allMatches, currentSearch.puuid);
+      renderRoleStats(allMatches, currentSearch.puuid);
+      renderFormSummary(allMatches, currentSearch.puuid);
+      renderRivalStats(allMatches, currentSearch.puuid);
     }
   }catch(e){
     setStatus($('matchListStatus'), `추가 전적을 불러오지 못했어요 (${e.message})`, 'err');
@@ -720,6 +901,8 @@ async function loadMoreMatches(){
 }
 $('loadMoreBtn').addEventListener('click', loadMoreMatches);
 $('modeFilter').addEventListener('change', renderMatchList);
+$('mapFilter').addEventListener('change', renderMatchList);
+$('agentFilter').addEventListener('change', renderMatchList);
 
 async function renderMatches(matches, myPuuid){
   if(!matches.length){
@@ -779,18 +962,36 @@ function tierBadgeHtml(tierName){
 
 function renderRosterCol(players, isMine, myId, icons){
   const head = isMine ? '우리 팀' : '상대 팀';
-  const rows = players.map(p => {
+  const sorted = [...players].sort((a, b) => (b.stats?.score ?? 0) - (a.stats?.score ?? 0));
+
+  // 파티 색상 배정 (같은 팀에 2명 이상인 party_id만 표시)
+  const partyCounts = {};
+  players.forEach(p => { if(p.party_id) partyCounts[p.party_id] = (partyCounts[p.party_id] || 0) + 1; });
+  const partyPalette = ['#4CE0C3', '#F2B138', '#B084F5', '#FF6B7A', '#5DA9FF'];
+  const partyColors = {};
+  let colorIdx = 0;
+  Object.keys(partyCounts).forEach(pid => {
+    if(partyCounts[pid] > 1){ partyColors[pid] = partyPalette[colorIdx % partyPalette.length]; colorIdx++; }
+  });
+
+  const rows = sorted.map((p, i) => {
     const isMe = p.puuid === myId;
     const nm = `${p.name || '?'}${p.tag ? '#' + p.tag : ''}`;
     const agentName = p.agent?.name || '?';
     const icon = icons[agentName];
     const tierName = p.tier?.name || '언랭크';
     const k = p.stats?.kills ?? 0, d = p.stats?.deaths ?? 0, a = p.stats?.assists ?? 0;
+    const rankHtml = i === 0
+      ? `<div class="rp-rank mvp" title="이 경기 전투 점수 1위">👑</div>`
+      : `<div class="rp-rank">${i + 1}</div>`;
+    const partyColor = partyColors[p.party_id];
+    const partyDot = partyColor ? `<span class="rp-party" style="background:${partyColor}" title="같은 파티"></span>` : '';
     return `
       <div class="roster-player">
+        ${rankHtml}
         ${icon ? `<img class="rp-icon" src="${icon}" alt="">` : `<div class="rp-icon"></div>`}
         <div class="rp-mid">
-          <div class="rp-name ${isMe ? 'me' : ''}">${escapeHtml(nm)}</div>
+          <div class="rp-name ${isMe ? 'me' : ''}">${partyDot}${escapeHtml(nm)}</div>
           ${tierBadgeHtml(tierName)}
         </div>
         <div class="rp-kda">${k}/${d}/${a}<span class="d">KDA</span></div>
@@ -841,9 +1042,19 @@ function openMatchModal(row, matches){
 
   const mapName = m?.metadata?.map?.name || '알 수 없는 맵';
   const modeName = m ? getModeName(m) : '';
+  const me = m ? (m.players || []).find(p => p.puuid === myId) : null;
+  const { resultLabel, resultClass, scoreText } = m && me ? getMatchResult(m, me) : { resultLabel:'', resultClass:'', scoreText:'' };
   $('matchModalHead').innerHTML = `
-    <div class="m-map">${escapeHtml(mapName)}</div>
-    <div class="m-sub">${escapeHtml(modeName)}</div>
+    <div>
+      <div class="m-map">${escapeHtml(mapName)}</div>
+      <div class="m-sub">${escapeHtml(modeName)}</div>
+    </div>
+    ${scoreText ? `
+      <div class="modal-head-score">
+        <div class="score-num ${resultClass}">${escapeHtml(scoreText)}</div>
+        <div class="score-result">${escapeHtml(resultLabel)}</div>
+      </div>
+    ` : ''}
   `;
   $('matchModalBody').innerHTML = `<div class="skeleton pulse">경기 상세 정보를 불러오는 중...</div>`;
 
@@ -874,6 +1085,17 @@ async function loadMatchModalContent(matchId, myId, region, headers){
     const kills = detail.kills || [];
     currentModalKills = kills;
     currentModalMyId = myId;
+
+    if(!weaponAggMatchIds.has(matchId)){
+      weaponAggMatchIds.add(matchId);
+      kills.forEach(k => {
+        if(k.killer?.puuid === myId && k.weapon?.name){
+          weaponAgg[k.weapon.name] = (weaponAgg[k.weapon.name] || 0) + 1;
+        }
+      });
+      renderWeaponStats();
+    }
+
     const roundNums = Array.from(new Set(kills.map(k => (k.round != null ? k.round : -1)))).sort((a,b) => a - b);
 
     const roundTabsHtml = kills.length
@@ -984,6 +1206,205 @@ function renderMapStats(matches, myPuuid){
         }).join('')}
       </tbody>
     </table>
+  `;
+}
+
+// ---------------- 역할군별 통계 ----------------
+function renderRoleStats(matches, myPuuid){
+  const map = aggregate(matches, myPuuid, (m, me) => getAgentRole(me.agent?.name));
+  const rows = Object.entries(map).sort((a,b) => b[1].games - a[1].games);
+  const el = $('roleStats');
+  if(!el) return;
+  if(!rows.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="field-label" style="margin-bottom:8px;">포지션별 승률</div>
+    <table class="table">
+      <thead><tr><th>포지션</th><th>경기</th><th>승률</th><th>평균 K/D/A</th></tr></thead>
+      <tbody>
+        ${rows.map(([role, s]) => {
+          const wr = Math.round((s.wins / s.games) * 100);
+          const avgK = (s.kills / s.games).toFixed(1);
+          const avgD = (s.deaths / s.games).toFixed(1);
+          const avgA = (s.assists / s.games).toFixed(1);
+          return `<tr>
+            <td>${escapeHtml(role)}</td>
+            <td class="num">${s.games}</td>
+            <td class="num ${winrateClass(wr)}">${wr}%</td>
+            <td class="num">${avgK}/${avgD}/${avgA}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ---------------- 무기 통계 (열어본 경기 기준) ----------------
+function renderWeaponStats(){
+  const el = $('weaponStats');
+  if(!el) return;
+  const rows = Object.entries(weaponAgg).sort((a,b) => b[1] - a[1]);
+  if(!rows.length){
+    el.innerHTML = `<div class="empty">아직 열어본 경기가 없어요. 전적 기록에서 경기를 클릭하면 여기에 무기 통계가 쌓여요.</div>`;
+    return;
+  }
+  const totalKills = rows.reduce((sum, [,c]) => sum + c, 0);
+  el.innerHTML = `
+    <table class="table">
+      <thead><tr><th>무기</th><th>킬</th><th>비중</th></tr></thead>
+      <tbody>
+        ${rows.map(([weapon, count]) => {
+          const pct = Math.round((count / totalKills) * 100);
+          return `<tr>
+            <td>${escapeHtml(weapon)}</td>
+            <td class="num">${count}</td>
+            <td class="num">${pct}%</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ---------------- 최근 폼 요약 / 연승·연패 ----------------
+function renderFormSummary(matches, myPuuid){
+  const el = $('formSummaryCard');
+  if(!el) return;
+  // 최신순으로 정렬된 상태라고 가정 (API가 최신순으로 내려줌)
+  const recent = matches.slice(0, 20);
+  const results = recent.map(m => {
+    const me = (m.players || []).find(p => p.puuid === myPuuid);
+    if(!me) return null;
+    return { me, ...getMatchResult(m, me) };
+  }).filter(Boolean);
+
+  if(!results.length){ el.innerHTML = `<div class="empty">폼을 계산할 데이터가 없어요.</div>`; return; }
+
+  const games = results.length;
+  const wins = results.filter(r => r.win === true).length;
+  const wr = Math.round((wins / games) * 100);
+  let totalK = 0, totalD = 0, totalA = 0, totalHS = 0, totalShots = 0;
+  results.forEach(r => {
+    totalK += r.me.stats?.kills ?? 0;
+    totalD += r.me.stats?.deaths ?? 0;
+    totalA += r.me.stats?.assists ?? 0;
+    const hs = r.me.stats?.headshots ?? 0;
+    const bs = r.me.stats?.bodyshots ?? 0;
+    const ls = r.me.stats?.legshots ?? 0;
+    totalHS += hs; totalShots += (hs + bs + ls);
+  });
+  const avgK = (totalK / games).toFixed(1);
+  const avgD = (totalD / games).toFixed(1);
+  const avgA = (totalA / games).toFixed(1);
+  const hsRate = totalShots ? Math.round((totalHS / totalShots) * 100) : 0;
+
+  // 연승/연패 (가장 최근 경기부터)
+  let streakCount = 0, streakType = null;
+  for(const r of results){
+    if(r.win === null) break;
+    if(streakType === null){ streakType = r.win; streakCount = 1; }
+    else if(r.win === streakType){ streakCount++; }
+    else break;
+  }
+  const streakHtml = streakType === null ? ''
+    : `<span class="streak-badge ${streakType ? 'win' : 'loss'}">${streakCount}${streakType ? '연승' : '연패'} 중</span>`;
+
+  el.innerHTML = `
+    <div class="field-label" style="margin-bottom:10px;">최근 ${games}경기 폼 ${streakHtml}</div>
+    <div class="form-summary">
+      <div class="form-stat"><div class="fs-label">승률</div><div class="fs-value ${winrateClass(wr)}">${wr}%</div></div>
+      <div class="form-stat"><div class="fs-label">전적</div><div class="fs-value">${wins}승 ${games - wins}패</div></div>
+      <div class="form-stat"><div class="fs-label">평균 K/D/A</div><div class="fs-value">${avgK}/${avgD}/${avgA}</div></div>
+      <div class="form-stat"><div class="fs-label">헤드샷률</div><div class="fs-value">${hsRate}%</div></div>
+    </div>
+  `;
+}
+
+// ---------------- 자주 만난 상대 ----------------
+function renderRivalStats(matches, myPuuid){
+  const el = $('rivalStats');
+  if(!el) return;
+  const map = {}; // puuid -> { name, games, winsVsThem, lossesVsThem }
+  matches.forEach(m => {
+    const me = (m.players || []).find(p => p.puuid === myPuuid);
+    if(!me) return;
+    const { win } = getMatchResult(m, me);
+    (m.players || []).forEach(p => {
+      if(p.puuid === myPuuid) return;
+      if(p.team_id === me.team_id) return; // 상대팀만 집계
+      const nm = `${p.name || '?'}${p.tag ? '#' + p.tag : ''}`;
+      if(!map[p.puuid]) map[p.puuid] = { name: nm, games: 0, wins: 0, losses: 0 };
+      map[p.puuid].games += 1;
+      if(win === true) map[p.puuid].wins += 1;
+      else if(win === false) map[p.puuid].losses += 1;
+    });
+  });
+  const rows = Object.values(map).filter(r => r.games >= 2).sort((a,b) => b.games - a.games).slice(0, 8);
+  if(!rows.length){
+    el.innerHTML = `<div class="empty">아직 2회 이상 마주친 상대가 없어요.</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <table class="table">
+      <thead><tr><th>플레이어</th><th>마주친 경기</th><th>나의 전적</th></tr></thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td>${escapeHtml(r.name)}</td>
+            <td class="num">${r.games}</td>
+            <td class="num">${r.wins}승 ${r.losses}패</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ---------------- RR 변동 그래프 ----------------
+async function loadRRHistory(region, puuid, headers){
+  const wrap = $('rrChartWrap');
+  wrap.innerHTML = `<div class="skeleton pulse">RR 변동 기록을 불러오는 중...</div>`;
+  try{
+    const res = await fetchJson(`https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/${region}/${puuid}`, headers);
+    const data = (res.data || []).slice().reverse(); // 과거 -> 최신 순으로 정렬
+    renderRRChart(data);
+  }catch(e){
+    wrap.innerHTML = `<div class="empty">RR 변동 기록을 불러오지 못했어요 (${escapeHtml(e.message)})</div>`;
+  }
+}
+
+function renderRRChart(data){
+  const wrap = $('rrChartWrap');
+  if(!data.length){
+    wrap.innerHTML = `<div class="empty">표시할 RR 변동 기록이 없어요.</div>`;
+    return;
+  }
+  const w = 900, h = 220, padL = 40, padR = 16, padT = 16, padB = 26;
+  const elos = data.map(d => d.elo ?? 0);
+  const minElo = Math.min(...elos), maxElo = Math.max(...elos);
+  const range = Math.max(1, maxElo - minElo);
+  const n = data.length;
+  const xStep = n > 1 ? (w - padL - padR) / (n - 1) : 0;
+  const yOf = (elo) => padT + (1 - (elo - minElo) / range) * (h - padT - padB);
+  const xOf = (i) => padL + i * xStep;
+
+  const points = data.map((d, i) => `${xOf(i)},${yOf(d.elo ?? 0)}`).join(' ');
+  const dots = data.map((d, i) => {
+    const change = d.mmr_change_to_last_game ?? 0;
+    const color = change > 0 ? 'var(--teal)' : (change < 0 ? '#FF6B7A' : 'var(--muted)');
+    const title = `${escapeHtml(d.currenttierpatched || '')} · ${change > 0 ? '+' : ''}${change} · ${escapeHtml(d.map?.name || '')}`;
+    return `<circle cx="${xOf(i)}" cy="${yOf(d.elo ?? 0)}" r="3.5" fill="${color}"><title>${title}</title></circle>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="rr-legend">
+      <span><span class="dot" style="background:var(--teal)"></span> RR 상승</span>
+      <span><span class="dot" style="background:#FF6B7A"></span> RR 하락</span>
+    </div>
+    <svg class="rr-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <polyline points="${points}" fill="none" stroke="var(--red)" stroke-width="2" opacity="0.85" />
+      ${dots}
+    </svg>
+    <div class="rr-chart-tip">최근 ${n}경기 기준 · 그래프에 마우스를 올리면 경기별 변동을 볼 수 있어요</div>
   `;
 }
 
@@ -1301,6 +1722,8 @@ async function loadStore(){
     $('storeBtn').disabled = false;
   }
 }
+
+renderRecentChips();
 
 
 
